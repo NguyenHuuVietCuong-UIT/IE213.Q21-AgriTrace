@@ -14,43 +14,43 @@ const makeNonce = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // --- LOGIC CHO NÔNG DÂN (FARMER - WEB2) ---
 exports.registerFarmer = async (req, res) => {
-    const { email, name, password } = req.body; // Cập nhật: dùng email và name
+    const { phone, name, password } = req.body;
 
-    if (!email || !name || !password) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ email, name và password' });
+    if (!phone || !name || !password) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ số điện thoại, tên và mật khẩu' });
     }
 
     try {
-        const existing = await User.findOne({ email });
-        if (existing) return res.status(400).json({ message: 'Email này đã được đăng ký' });
+        const existing = await User.findOne({ phone });
+        if (existing) return res.status(400).json({ message: 'Số điện thoại này đã được đăng ký' });
 
         const hashed = await bcrypt.hash(password, 10);
         const farmer = await User.create({
-            email,
+            phone,
             name,
             passwordHash: hashed,
             role: 'FARMER'
         });
 
-        res.status(201).json({ user: { id: farmer._id, email: farmer.email, name: farmer.name, role: 'FARMER' } });
+        res.status(201).json({ user: { id: farmer._id, phone: farmer.phone, name: farmer.name, role: 'FARMER' } });
     } catch (err) {
         res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
     }
 };
 
 exports.loginFarmer = async (req, res) => {
-    const { email, password } = req.body; // Cập nhật: dùng email
+    const { phone, password } = req.body;
 
-    if (!email || !password) return res.status(400).json({ message: 'Vui lòng cung cấp email và password' });
+    if (!phone || !password) return res.status(400).json({ message: 'Vui lòng cung cấp số điện thoại và mật khẩu' });
 
     try {
-        const user = await User.findOne({ email, role: 'FARMER' });
+        const user = await User.findOne({ phone, role: 'FARMER' });
         if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
             return res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ' });
         }
 
         const token = getJwt(user);
-        res.json({ token, user: { id: user._id, email: user.email, name: user.name, role: user.role } });
+        res.json({ token, user: { id: user._id, phone: user.phone, name: user.name, role: user.role } });
     } catch (err) {
         res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
     }
