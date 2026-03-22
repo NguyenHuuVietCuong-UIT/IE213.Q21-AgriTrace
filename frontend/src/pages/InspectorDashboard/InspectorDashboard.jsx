@@ -2,7 +2,7 @@ import React from 'react';
 import { Sidebar } from '../../components/Sidebar/Sidebar';
 import { BatchCard } from '../../components/BatchCard/BatchCard';
 import { StatCard } from '../../components/StatCard/StatCard'; // 1. Import thẻ StatCard
-import { useWeb3Mock } from '../../hooks/useWeb3Mock';
+import { useWeb3 } from '../../hooks/useWeb3';
 import styles from './InspectorDashboard.module.css';
 
 // Dán đè đoạn này lên trên hàm export const InspectorDashboard = () => { ... }
@@ -43,7 +43,7 @@ const MOCK_BATCHES = [
 ];
 
 export const InspectorDashboard = () => {
-    const { account, isConnecting, isMinting, connectWallet, handleMintNFT } = useWeb3Mock();
+    const { account, isConnecting, isMinting, connectWallet, handleMintNFT } = useWeb3();
 
     return (
         <div className={styles.layout}>
