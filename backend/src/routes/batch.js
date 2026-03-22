@@ -1,0 +1,16 @@
+const express = require('express');
+const router = express.Router();
+const batchController = require('../controllers/batchController');
+const { verifyToken, requireRole } = require('../middlewares/auth');
+
+// LUỒNG NÔNG DÂN
+router.get('/mine', verifyToken, requireRole('FARMER'), batchController.getMyBatches);
+router.post('/', verifyToken, requireRole('FARMER'), batchController.createBatch);
+router.post('/:batchId/logs', verifyToken, requireRole('FARMER'), batchController.addLog);
+
+// LUỒNG KIỂM ĐỊNH
+router.get('/pending', verifyToken, requireRole('INSPECTOR'), batchController.getPendingBatches);
+router.post('/:batchId/pin', verifyToken, requireRole('INSPECTOR'), batchController.pinToIPFS);
+router.post('/:batchId/mint', verifyToken, requireRole('INSPECTOR'), batchController.confirmMint);
+
+module.exports = router;

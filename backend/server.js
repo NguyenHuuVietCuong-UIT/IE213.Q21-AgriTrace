@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const authRoutes = require('./routes/auth');
-const batchRoutes = require('./routes/batch');
-const publicRoutes = require('./routes/public');
+const authRoutes = require('./src/routes/auth');
+const batchRoutes = require('./src/routes/batch');
+const publicRoutes = require('./src/routes/public');
 
 const app = express();
 app.use(cors());
