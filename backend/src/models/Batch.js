@@ -1,21 +1,24 @@
 const mongoose = require('mongoose');
 
+// Khai báo Schema cho từng đối tượng bên trong mảng logs
 const logSchema = new mongoose.Schema({
-  date: { type: Date, default: () => new Date() },
-  activity: { type: String, required: true },
-  notes: { type: String },
-  imageUrl: { type: String }
-});
+  action: { type: String, required: true },
+  actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  location: { type: String, required: true },
+  timestamp: { type: Date, required: true, default: Date.now },
+  imageUrl: { type: String, default: "" } // TRƯỜNG HÌNH ẢNH MỚI ĐƯỢC THÊM VÀO
+}, { _id: false });
 
+// Schema chính của Lô hàng
 const batchSchema = new mongoose.Schema({
-  farmer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  cropType: { type: String, required: true },
-  name: { type: String, required: true },
-  estimatedQuantity: { type: Number, required: true },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  inspectorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  harvestDate: { type: Date, required: true },
+  quantity: { type: Number, required: true },
   status: { type: String, enum: ['PENDING', 'LOCKED', 'MINTED'], default: 'PENDING' },
-  logs: [logSchema],
-  ipfsLink: { type: String },
-  tokenId: { type: String },
+  logs: [logSchema], // Mảng logs chứa hình ảnh nằm ở đây
+  ipfsHash: { type: String },
+  tokenId: { type: Number },
   txHash: { type: String }
 }, { timestamps: true });
 

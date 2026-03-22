@@ -1,4 +1,12 @@
 import { useState } from 'react';
+import { ethers } from 'ethers'; // THÊM: Thư viện kết nối Blockchain
+
+// THÊM: Khai báo địa chỉ và ABI tối giản của Smart Contract (Có thể đưa vào file .env sau)
+const CONTRACT_ADDRESS = import.meta.env.VITE_NFT_CONTRACT_ADDRESS || "0x_ĐIỀN_ĐỊA_CHỈ_CONTRACT_VÀO_ĐÂY";
+const MINIMAL_ABI = [
+    "function mintBatchNFT(string memory tokenURI) public returns (uint256)",
+    "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+];
 
 export const useWeb3 = () => {
     const [account, setAccount] = useState(null);
@@ -25,22 +33,39 @@ export const useWeb3 = () => {
     };
 
     // Hàm xử lý khi bấm nút "Duyệt & Đúc NFT"
-    const handleMintNFT = async (batchId) => {
+    // SỬA: Thay thế logic giả lập bằng tương tác Blockchain thật
+    const handleMintNFT = async (tokenURI) => {
         if (!account) {
             alert("⚠️ Vui lòng kết nối ví MetaMask ở góc trái trước khi đúc NFT!");
-            return;
+            return null; // Trả về null nếu chưa kết nối ví
         }
 
         setIsMinting(true);
         try {
-            // Tạm thời giả lập thời gian chờ Blockchain xác nhận (2 giây)
-            // Sau này Thành viên 5 sẽ gọi API của Backend tại đây
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
 
-            alert(`🎉 Thành công! Đã duyệt và đúc chứng nhận NFT cho lô hàng: ${batchId}`);
+            // 1. Gọi Blockchain đúc NFT
+            const tx = await contract.mintBatchNFT(tokenURI);
+            const receipt = await tx.wait(); // Chờ giao dịch hoàn tất
+
+            // 2. Bóc tách Token ID từ sự kiện sinh ra
+            let tokenId = null;
+            for (const log of receipt.logs) {
+                try {
+                    const parsedLog = contract.interface.parseLog(log);
+                    if (parsedLog && parsedLog.name === 'Transfer') {
+                        tokenId = parsedLog.args.tokenId.toString();
+                    }
+                } catch (e) { /* Bỏ qua log rác */ }
+            }
+
+            return { txHash: receipt.hash, tokenId }; // Trả về kết quả cho Dashboard xử lý tiếp
         } catch (error) {
             console.error("Lỗi đúc NFT:", error);
-            alert("❌ Có lỗi xảy ra khi đúc NFT.");
+            alert("❌ Có lỗi xảy ra khi gọi ví đúc NFT.");
+            return null;
         } finally {
             setIsMinting(false);
         }

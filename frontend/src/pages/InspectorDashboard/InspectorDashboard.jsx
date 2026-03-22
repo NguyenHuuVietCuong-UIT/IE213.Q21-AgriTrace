@@ -1,49 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // SỬA: Thêm useState, useEffect
 import { Sidebar } from '../../components/Sidebar/Sidebar';
 import { BatchCard } from '../../components/BatchCard/BatchCard';
-import { StatCard } from '../../components/StatCard/StatCard'; // 1. Import thẻ StatCard
+import { StatCard } from '../../components/StatCard/StatCard';
 import { useWeb3 } from '../../hooks/useWeb3';
 import styles from './InspectorDashboard.module.css';
 
-// Dán đè đoạn này lên trên hàm export const InspectorDashboard = () => { ... }
-const MOCK_BATCHES = [
-    {
-        id: 'B1',
-        name: 'Lô Xoài Cát Chu 2026',
-        status: 'Chờ kiểm định',
-        farmer: 'Nguyễn Văn An',
-        location: 'Đồng Tháp',
-        cropType: 'Xoài Cát Chu',
-        area: '1.5 ha',
-        quantity: '800 kg',
-        progress: 100
-    },
-    {
-        id: 'B2',
-        name: 'Lô Cà Phê Arabica 2026',
-        status: 'Chờ kiểm định',
-        farmer: 'Trần Thị Bình',
-        location: 'Lâm Đồng',
-        cropType: 'Cà Phê Arabica',
-        area: '2 ha',
-        quantity: '1500 kg',
-        progress: 100
-    },
-    {
-        id: 'B3',
-        name: 'Lô Thanh Long Ruột Đỏ',
-        status: 'Chờ kiểm định',
-        farmer: 'Lê Văn Cường',
-        location: 'Bình Thuận',
-        cropType: 'Thanh Long',
-        area: '1.2 ha',
-        quantity: '600 kg',
-        progress: 100
-    }
-];
+// XÓA BỎ TOÀN BỘ MẢNG MOCK_BATCHES Ở ĐÂY
 
 export const InspectorDashboard = () => {
     const { account, isConnecting, isMinting, connectWallet, handleMintNFT } = useWeb3();
+
+    // THÊM: State lưu lô hàng và hàm gọi API
+    const [batches, setBatches] = useState([]);
+
+    const fetchPendingBatches = async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/batches/pending', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (res.ok) setBatches(await res.json());
+        } catch (error) {
+            console.error("Lỗi tải danh sách:", error);
+        }
+    };
+
+    useEffect(() => { fetchPendingBatches(); }, []);
+
+    // THÊM: Hàm xử lý quy trình 3 bước (IPFS -> Mint -> Database)
+    const processApproveAndMint = async (batchId) => {
+        try {
+            // 1. Gắn IPFS
+            const pinRes = await fetch(`http://localhost:5000/api/batches/${batchId}/pin`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            const pinData = await pinRes.json();
+            if (!pinData.success) throw new Error("Lỗi đẩy IPFS");
+
+            // 2. Ký ví MetaMask (dùng hàm handleMintNFT từ hook)
+            const mintResult = await handleMintNFT(`ipfs://${pinData.ipfsHash}`);
+            if (!mintResult) return; // Người dùng từ chối ký
+
+            // 3. Báo Backend cập nhật MINTED
+            await fetch(`http://localhost:5000/api/batches/${batchId}/mint`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ tokenId: mintResult.tokenId, txHash: mintResult.txHash })
+            });
+
+            alert(`🎉 Đã đúc NFT thành công! Token ID: ${mintResult.tokenId}`);
+            fetchPendingBatches(); // Làm mới giao diện
+        } catch (err) {
+            alert(`❌ Lỗi: ${err.message}`);
+        }
+    };
 
     return (
         <div className={styles.layout}>
@@ -67,14 +80,32 @@ export const InspectorDashboard = () => {
                     <div className={styles.grid}>
 
                         {/* Đây là đoạn code thực sự yêu cầu React vẽ các thẻ ra: */}
-                        {MOCK_BATCHES.map((batch) => (
-                            <BatchCard
-                                key={batch.id}
-                                batch={batch}
-                                onMint={handleMintNFT}
-                                isMinting={isMinting}
-                            />
-                        ))}
+                        {/* SỬA: Đổ dữ liệu thực tế từ Database */}
+                        {batches.length === 0 ? <p>Không có lô hàng chờ duyệt.</p> :
+                            batches.map((batch) => {
+                                // Ánh xạ dữ liệu DB sang cấu trúc của BatchCard Component
+                                const displayData = {
+                                    id: batch._id,
+                                    name: `Lô ${batch.productId?.productName || 'Sản phẩm'}`,
+                                    status: 'Chờ kiểm định',
+                                    farmer: 'Xem chi tiết...',
+                                    location: 'Đã định vị',
+                                    cropType: batch.productId?.productName,
+                                    area: 'N/A',
+                                    quantity: `${batch.quantity} kg`,
+                                    progress: 100
+                                };
+
+                                return (
+                                    <BatchCard
+                                        key={displayData.id}
+                                        batch={displayData}
+                                        onMint={() => processApproveAndMint(batch._id)} // Truyền hàm xử lý mới vào đây
+                                        isMinting={isMinting}
+                                    />
+                                );
+                            })
+                        }
 
                     </div>
                 </section>
