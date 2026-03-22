@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+
+# Environment variables (Bảo mật quan trọng nhất)
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Blockchain / Hardhat / Truffle (nếu dùng)
+artifacts/
+cache/
+typechain/
+coverage/
+
+# IDE files
+.vscode/
+.idea/
