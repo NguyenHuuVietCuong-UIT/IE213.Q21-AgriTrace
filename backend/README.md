@@ -9,8 +9,8 @@
 
 ## API chính
 
-- POST `/api/auth/farmer/register` Body: `{ phone, password }`
-- POST `/api/auth/farmer/login` Body: `{ phone, password }`
+- POST `/api/auth/farmer/register` Body: `{ email, password }`
+- POST `/api/auth/farmer/login` Body: `{ email, password }`
 - POST `/api/auth/inspector/request-nonce` Body: `{ walletAddress }`
 - POST `/api/auth/inspector/verify` Body: `{ walletAddress, signature }`
 - POST `/api/batches` (người FARMER) Body: `{ cropType, name, estimatedQuantity }`

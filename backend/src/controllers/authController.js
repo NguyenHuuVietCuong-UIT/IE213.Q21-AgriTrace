@@ -14,10 +14,10 @@ const makeNonce = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // --- LOGIC CHO NÔNG DÂN (FARMER - WEB2) ---
 exports.registerFarmer = async (req, res) => {
-    const { email, name, password } = req.body; // Cập nhật: dùng email và name
+    const { email, name, password } = req.body;
 
     if (!email || !name || !password) {
-        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ email, name và password' });
+        return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ email, tên và mật khẩu' });
     }
 
     try {
@@ -39,9 +39,9 @@ exports.registerFarmer = async (req, res) => {
 };
 
 exports.loginFarmer = async (req, res) => {
-    const { email, password } = req.body; // Cập nhật: dùng email
+    const { email, password } = req.body;
 
-    if (!email || !password) return res.status(400).json({ message: 'Vui lòng cung cấp email và password' });
+    if (!email || !password) return res.status(400).json({ message: 'Vui lòng cung cấp email và mật khẩu' });
 
     try {
         const user = await User.findOne({ email, role: 'FARMER' });
