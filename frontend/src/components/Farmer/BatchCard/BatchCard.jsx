@@ -15,6 +15,7 @@ const BatchCard = ({ batch, onAddActivity, onComplete }) => {
 
   return (
     <div className={styles.card}>
+      {/* Tiêu đề */}
       <div className={styles.header}>
         <h3 className={styles.title}>{batch.name}</h3>
         <div className={styles.tags}>
@@ -25,6 +26,7 @@ const BatchCard = ({ batch, onAddActivity, onComplete }) => {
         </div>
       </div>
 
+      {/* Thanh tiến độ */}
       <div className={styles.progressSection}>
         <div className={styles.progressInfo}>
           <span>Tiến độ</span>
@@ -35,13 +37,13 @@ const BatchCard = ({ batch, onAddActivity, onComplete }) => {
         </div>
       </div>
 
+      {/* Nút thêm hoạt động */}
       <div className={styles.actions}>
         {batch.status === 'farming' && (
           <>
             <button className={styles.btnPrimary} onClick={() => onAddActivity(batch.id)}>
               <LuPlus /> Thêm hoạt động
             </button>
-            {/* 2. ĐÃ SỬA Ở ĐÂY: Thẻ LuCheckCircle đổi thành LuCircleCheck */}
             <button className={styles.btnOutline} onClick={() => onComplete(batch.id)}>
               <LuCircleCheck /> Hoàn tất
             </button>

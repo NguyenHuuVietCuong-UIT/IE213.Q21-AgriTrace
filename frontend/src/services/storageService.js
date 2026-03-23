@@ -23,6 +23,16 @@ const MOCK_DATA = [
     weight: '400 kg',
     progress: 100,
     logs: []
+  },
+  {
+    id: 'B2026-C',
+    name: 'Lô Cà chua độc dược',
+    status: 'minted',
+    product: 'Cà chua',
+    area: '1 ha',
+    weight: '1000 kg',
+    progress: 100,
+    logs: []
   }
 ];
 
