@@ -4,8 +4,8 @@
   "description": "Backend API for AgriTrace Web2/Web3 workflows",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [
     "agritrace",
@@ -23,7 +23,6 @@
     "ethers": "^6.15.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb-memory-server": "^11.0.1",
     "mongoose": "^8.19.1"
   },
   "devDependencies": {

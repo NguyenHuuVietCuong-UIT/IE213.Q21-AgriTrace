@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+
+// CHỈNH SỬA: Đã xóa dòng require mongodb-memory-server gây lỗi
 
 const authRoutes = require('./src/routes/auth');
 const batchRoutes = require('./src/routes/batch');
@@ -27,30 +28,27 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000; // Đổi mặc định thành 5000 cho khớp với các hướng dẫn trước
 
 async function start() {
-  let memoryServer;
   try {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI);
-      console.log('MongoDB connected');
-    } catch (dbErr) {
-      console.warn('Local MongoDB unavailable, starting in-memory MongoDB for development...');
-      memoryServer = await MongoMemoryServer.create();
-      const memoryUri = memoryServer.getUri('agritrace');
-      await mongoose.connect(memoryUri);
-      console.log('MongoDB in-memory connected');
+    // CHỈNH SỬA: Chỉ giữ lại logic kết nối trực tiếp tới MongoDB Atlas
+    // Đảm bảo trong file .env bạn đặt tên biến là MONGODB_URI hoặc MONGO_URI cho khớp
+    const dbUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+    if (!dbUri) {
+      console.error('LỖI: Chưa cấu hình MONGODB_URI trong file .env');
+      process.exit(1);
     }
 
+    await mongoose.connect(dbUri);
+    console.log('✅ MongoDB Atlas connected successfully');
+
     app.listen(PORT, () => {
-      console.log(`Server listening on http://localhost:${PORT}`);
+      console.log(`🚀 Server listening on http://localhost:${PORT}`);
     });
   } catch (err) {
-    if (memoryServer) {
-      await memoryServer.stop();
-    }
-    console.error('Startup failure', err);
+    console.error('❌ Startup failure:', err.message);
     process.exit(1);
   }
 }
