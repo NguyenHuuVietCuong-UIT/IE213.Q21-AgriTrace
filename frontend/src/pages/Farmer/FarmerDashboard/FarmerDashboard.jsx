@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// SỬA LẠI DÒNG NÀY: Import đúng 4 icon dành riêng cho thẻ thống kê
 import { LuBox, LuTrendingUp, LuPackageCheck, LuAward } from "react-icons/lu";
 import { storageService } from '../../../services/storageService';
 import BatchCard from '../../../components/Farmer/BatchCard/BatchCard';
@@ -8,15 +7,16 @@ import styles from './FarmerDashboard.module.css';
 const FarmerDashboard = () => {
   const [batches, setBatches] = useState([]);
 
+  // Khởi tạo dữ liệu mẫu
   useEffect(() => {
-    storageService.init(); // Khởi tạo dữ liệu mẫu
+    storageService.init(); 
     setBatches(storageService.getBatches());
   }, []);
 
   const handleComplete = (id) => {
     if(window.confirm("Xác nhận hoàn tất lô hàng này?")) {
       const updated = storageService.updateStatus(id, 'pending');
-      setBatches(updated); // Cập nhật lại State để giao diện đổi ngay lập tức
+      setBatches(updated);
     }
   };
 
@@ -28,7 +28,7 @@ const FarmerDashboard = () => {
     }
   };
 
-  // TÍNH TOÁN SỐ LIỆU CHO 4 THẺ THỐNG KÊ
+  // Số liệu cho thống kê
   const totalBatches = batches.length;
   const farmingCount = batches.filter(b => b.status === 'farming').length;
   const pendingCount = batches.filter(b => b.status === 'pending').length;
@@ -41,46 +41,38 @@ const FarmerDashboard = () => {
         <p>Quản lý các lô hàng và hoạt động canh tác</p>
       </header>
 
-      {/* KHU VỰC THỐNG KÊ */}
+      {/* Thống kê */}
       <div className={styles.statsGrid}>
-        {/* Thẻ 1: Tổng số */}
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Tổng số lô</span>
-            <div className={styles.statNumber}>{totalBatches}</div>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconTotal}`}><LuBox /></div>
-        </div>
-
-        {/* Thẻ 2: Đang canh tác */}
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Đang canh tác</span>
-            <div className={styles.statNumber} style={{color: '#10b981'}}>{farmingCount}</div>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconFarming}`}><LuTrendingUp /></div>
-        </div>
-
-        {/* Thẻ 3: Chờ kiểm định */}
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Chờ kiểm định</span>
-            <div className={styles.statNumber} style={{color: '#f59e0b'}}>{pendingCount}</div>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconPending}`}><LuPackageCheck /></div>
-        </div>
-
-        {/* Thẻ 4: Đã đúc NFT */}
-        <div className={styles.statCard}>
-          <div className={styles.statInfo}>
-            <span>Đã đúc NFT</span>
-            <div className={styles.statNumber} style={{color: '#3b82f6'}}>{mintedCount}</div>
-          </div>
-          <div className={`${styles.statIcon} ${styles.iconMinted}`}><LuAward /></div>
-        </div>
+        <StatCard 
+          label="Tổng số lô" 
+          value={totalBatches} 
+          icon={<LuBox />} 
+          iconClass={styles.iconTotal} 
+        />
+        <StatCard 
+          label="Đang canh tác" 
+          value={farmingCount} 
+          valueColor="#10b981"
+          icon={<LuTrendingUp />} 
+          iconClass={styles.iconFarming} 
+        />
+        <StatCard 
+          label="Chờ kiểm định" 
+          value={pendingCount} 
+          valueColor="#f59e0b"
+          icon={<LuPackageCheck />} 
+          iconClass={styles.iconPending} 
+        />
+        <StatCard 
+          label="Đã đúc NFT" 
+          value={mintedCount} 
+          valueColor="#3b82f6"
+          icon={<LuAward />} 
+          iconClass={styles.iconMinted} 
+        />
       </div>
 
-      {/* Grid danh sách lô hàng */}
+      {/* Danh sách lô hàng */}
       <div className={styles.batchGrid}>
         {batches.map(batch => (
           <BatchCard 
@@ -94,5 +86,22 @@ const FarmerDashboard = () => {
     </div>
   );
 };
+
+// Component con
+const StatCard = ({ label, value, icon, iconClass, valueColor }) => (
+  <div className={styles.statCard}>
+
+    <div className={styles.statInfo}>
+      <span>{label}</span>
+      <div className={styles.statNumber} style={{ color: valueColor }}>
+        {value}
+      </div>
+    </div>
+
+    <div className={`${styles.statIcon} ${iconClass}`}>
+      {icon}
+    </div>
+  </div>
+);
 
 export default FarmerDashboard;

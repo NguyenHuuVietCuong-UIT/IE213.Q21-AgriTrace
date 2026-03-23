@@ -27,7 +27,7 @@ const MOCK_DATA = [
 ];
 
 export const storageService = {
-  // Khởi tạo dữ liệu mẫu nếu chưa có gì trong máy
+  // Khởi tạo dữ liệu mẫu
   init() {
     if (!localStorage.getItem(STORAGE_KEY)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_DATA));
@@ -42,7 +42,11 @@ export const storageService = {
   updateStatus(batchId, newStatus) {
     const batches = this.getBatches();
     const updated = batches.map(b => 
-      b.id === batchId ? { ...b, status: newStatus, progress: newStatus === 'pending' ? 100 : b.progress } : b
+      b.id === batchId ? { 
+        ...b, 
+        status: newStatus, 
+        progress: newStatus === 'pending' ? 100 : b.progress 
+      } : b
     );
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     return updated;
@@ -53,7 +57,11 @@ export const storageService = {
     const batches = this.getBatches();
     const updated = batches.map(b => {
       if (b.id === batchId) {
-        const newLog = { id: Date.now(), date: new Date().toISOString().split('T')[0], action: actionText };
+        const newLog = { 
+          id: Date.now(), 
+          date: new Date().toISOString().split('T')[0], 
+          action: actionText 
+        };
         return { ...b, logs: [newLog, ...b.logs] };
       }
       return b;

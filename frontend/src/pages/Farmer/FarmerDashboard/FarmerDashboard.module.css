@@ -1,11 +1,12 @@
 .container {
   padding: 2rem 5%;
-  background-color: #f8fafc; /* Nền xám nhạt để nổi bật các Card trắng */
+  background-color: #f8fafc; 
   min-height: 100vh;
 }
 
 .header {
   margin-bottom: 2.5rem;
+  text-align: center;
 }
 
 .header h1 {
@@ -19,7 +20,7 @@
   font-size: 1.1rem;
 }
 
-/* --- Khu vực 4 thẻ thống kê --- */
+/* Khu vực 4 thẻ thống kê */
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -67,7 +68,7 @@
 .iconPending { background: #fff7ed; color: #f59e0b; }
 .iconMinted { background: #eff6ff; color: #3b82f6; }
 
-/* --- Lưới danh sách lô hàng --- */
+/* Lưới danh sách lô hàng */
 .batchGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));

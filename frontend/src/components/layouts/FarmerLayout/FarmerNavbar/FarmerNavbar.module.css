@@ -1,0 +1,213 @@
+.topbar {
+  --nav-bg-white: #ffffff;
+  --nav-icon-green: #10B981;
+  --nav-logotext-dark: #1e293b;
+  --nav-link-slate: #475569;
+  --nav-linkhov-green: #10B981;
+  --nav-shadow: rgba(0, 0, 0, 0.05);
+  
+  /* Các biến bổ sung riêng cho Farmer */
+  --nav-active-bg: rgba(16, 185, 129, 0.1);
+  --nav-hover-bg: rgba(16, 185, 129, 0.05);
+  --nav-avatar-bg: rgba(16, 185, 129, 0.15);
+  --nav-badge-red: #ef4444;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 5rem; 
+  background-color: var(--nav-bg-white);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px var(--nav-shadow);
+  transition: padding 0.3s ease;
+  height: 75px; 
+}
+
+/* Logo */
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIcon {
+  background-color: var(--nav-icon-green);
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--nav-logotext-dark);
+  line-height: 1.1;
+}
+
+.portal {
+  font-size: 0.75rem;
+  color: var(--nav-link-slate);
+  font-weight: 500;
+}
+
+/* Menu */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: var(--nav-link-slate);
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.navItem:hover {
+  color: var(--nav-linkhov-green);
+  background-color: var(--nav-hover-bg);
+}
+
+/* Trạng thái Active (Trang hiện tại) */
+.active {
+  color: var(--nav-icon-green);
+  font-weight: 600;
+}
+
+/* User */
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.notification {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--nav-link-slate);
+  transition: color 0.3s ease;
+}
+
+.notification:hover {
+  color: var(--nav-linkhov-green);
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: var(--nav-badge-red);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--nav-bg-white);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.userInfo:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.avatar {
+  background-color: var(--nav-avatar-bg);
+  color: var(--nav-icon-green);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--nav-logotext-dark);
+}
+
+.userRole {
+  font-size: 0.75rem;
+  color: var(--nav-link-slate);
+}
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+  .topbar {
+    padding: 1rem 2rem;
+  }
+  .navLinks {
+    gap: 0.5rem;
+  }
+  .userSection {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .portal, 
+  .userDetails, 
+  .navItem span {
+    display: none; 
+  }
+
+  .navItem {
+    padding: 0.5rem; 
+  }
+
+  .userSection {
+    gap: 1rem;
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+}

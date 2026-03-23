@@ -1,5 +1,4 @@
 import React from 'react';
-// 1. ĐÃ SỬA Ở ĐÂY: LuCheckCircle đổi thành LuCircleCheck
 import { LuPlus, LuCircleCheck, LuExternalLink, LuChevronDown } from "react-icons/lu";
 import styles from './BatchCard.module.css';
 
