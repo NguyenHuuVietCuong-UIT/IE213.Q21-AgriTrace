@@ -1,0 +1,142 @@
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Các loại Badge trạng thái */
+.badgeFarming { background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+.badgePending { background: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+.badgeMinted { background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+
+.tag {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+/* --- Progress Section --- */
+.progressSection {
+  margin: 1.5rem 0;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.progressBar {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #1e293b; /* Thanh tiến độ màu đen như ảnh của bạn */
+  transition: width 0.5s ease-out;
+}
+
+/* --- Button Actions --- */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btnPrimary {
+  flex: 2;
+  background: #00a651;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btnOutline {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btnWait {
+  width: 100%;
+  background: #f3c08b;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  cursor: not-allowed;
+}
+
+.btnNFT {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnLogs {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #64748b;
+  margin-top: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'; // SỬA: Thêm useState, useEffect
-import { Sidebar } from '../../components/Sidebar/Sidebar';
-import { BatchCard } from '../../components/BatchCard/BatchCard';
-import { StatCard } from '../../components/StatCard/StatCard';
+import { Sidebar } from '../../components/Inspector/Sidebar/Sidebar';
+import { BatchCard } from '../../components/Inspector/BatchCard/BatchCard';
+import { StatCard } from '../../components/Inspector/StatCard/StatCard';
 import { useWeb3 } from '../../hooks/useWeb3';
 import styles from './InspectorDashboard.module.css';
 

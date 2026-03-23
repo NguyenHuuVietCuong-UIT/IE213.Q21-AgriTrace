@@ -1,0 +1,120 @@
+:root {
+  --nav-bg-white: #ffffff;
+  --nav-icon-green: #10B981;
+  --nav-logotext-dark: #1e293b;
+  --nav-link-slate: #475569;
+  --nav-linkhov-green: #10B981;
+  --nav-btn-green: #10B981;
+  --nav-btnhov-darkgreen: #075e39;
+  --nav-shadow: rgba(0, 0, 0, 0.05);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Desktop padding */
+  padding: 1.5rem 5rem; 
+  background-color: var(--nav-bg-white);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px var(--nav-shadow);
+  transition: padding 0.3s ease;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIcon {
+  background-color: var(--nav-icon-green);
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--nav-logotext-dark);
+}
+
+.navContent {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  text-decoration: none;
+  color: var(--nav-link-slate);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--nav-linkhov-green);
+}
+
+.loginBtn {
+  background-color: var(--nav-btn-green);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+  background-color: var(--nav-btnhov-darkgreen);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 1rem 2rem; /* Padding cho tablet */
+  }
+  
+  .navContent {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem; /* Padding cho mobile */
+  }
+
+  /* Ẩn các link điều hướng trên mobile */
+  .navLinks {
+    display: none; 
+  }
+
+  .logoText {
+    font-size: 1.25rem; /* Thu nhỏ chữ logo trên mobile */
+  }
+
+  .loginBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
