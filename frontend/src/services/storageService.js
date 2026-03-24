@@ -1,10 +1,11 @@
 const STORAGE_KEY = 'agritrace_batches';
 
 const MOCK_DATA = [
+  // status: farming, pending, minted
   {
     id: 'B2026-A',
     name: 'Lô Lúa Xuân 2026-A',
-    status: 'farming', // farming, pending, minted
+    status: 'farming', 
     product: 'Lúa Jasmine',
     area: '2.5 ha',
     weight: '1200 kg',
@@ -48,7 +49,7 @@ export const storageService = {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   },
 
-  // Cập nhật trạng thái lô hàng (Hoàn tất)
+  // Hoàn tất trạng thái lô hàng
   updateStatus(batchId, newStatus) {
     const batches = this.getBatches();
     const updated = batches.map(b => 
