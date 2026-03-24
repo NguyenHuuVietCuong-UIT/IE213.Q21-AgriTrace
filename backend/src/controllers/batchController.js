@@ -5,7 +5,7 @@ const { ethers } = require('ethers');
 exports.getMyBatches = async (req, res) => {
     try {
         // Tìm các lô hàng mà Nông dân này đã tham gia ghi nhật ký (hoặc là chủ nông trại)
-        const batches = await Batch.find({ 'logs.actorId': req.user._id })
+        const batches = await Batch.find({ farmerId: req.user._id })
             .populate('productId')
             .sort({ createdAt: -1 });
         res.json(batches);
@@ -23,6 +23,7 @@ exports.createBatch = async (req, res) => {
 
     try {
         const batch = await Batch.create({
+            farmerId: req.user._id, // Gán ID của người tạo
             productId,
             harvestDate,
             quantity,
@@ -120,5 +121,32 @@ exports.confirmMint = async (req, res) => {
         res.json(batch);
     } catch (err) {
         res.status(500).json({ message: 'Lỗi khi cập nhật trạng thái NFT', error: err.message });
+    }
+};
+
+exports.lockBatch = async (req, res) => {
+    const { batchId } = req.params;
+
+    try {
+        const batch = await Batch.findById(batchId);
+
+        if (!batch) return res.status(404).json({ message: 'Không tìm thấy lô hàng' });
+
+        // Kiểm tra quyền sở hữu
+        if (batch.farmerId.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Bạn không có quyền thao tác trên lô hàng này' });
+        }
+
+        if (batch.status !== 'PENDING') {
+            return res.status(400).json({ message: 'Lô hàng không ở trạng thái có thể khóa' });
+        }
+
+        // Chuyển trạng thái sang LOCKED (Chờ kiểm định)
+        batch.status = 'LOCKED';
+        await batch.save();
+
+        res.json({ message: 'Đã gửi yêu cầu kiểm định thành công', batch });
+    } catch (err) {
+        res.status(500).json({ message: 'Lỗi khi khóa lô hàng', error: err.message });
     }
 };

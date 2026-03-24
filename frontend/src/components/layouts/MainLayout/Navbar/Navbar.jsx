@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Navbar.module.css';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   return (
@@ -19,9 +20,9 @@ const Navbar = () => {
         </ul>
 
         {/* Nút Đăng nhập */}
-        <button className={styles.loginBtn}>
+        <Link to="/login" className={styles.loginBtn}>
           Đăng nhập
-        </button>
+        </Link>
       </div>
     </nav>
   );

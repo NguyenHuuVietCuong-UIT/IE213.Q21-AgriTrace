@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from 'react'; // SỬA: Thêm useState, useEffect
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../../components/Inspector/Sidebar/Sidebar';
 import { BatchCard } from '../../components/Inspector/BatchCard/BatchCard';
 import { StatCard } from '../../components/Inspector/StatCard/StatCard';
 import { useWeb3 } from '../../hooks/useWeb3';
 import styles from './InspectorDashboard.module.css';
 
-// XÓA BỎ TOÀN BỘ MẢNG MOCK_BATCHES Ở ĐÂY
-
 export const InspectorDashboard = () => {
     const { account, isConnecting, isMinting, connectWallet, handleMintNFT } = useWeb3();
-
-    // THÊM: State lưu lô hàng và hàm gọi API
     const [batches, setBatches] = useState([]);
 
     const fetchPendingBatches = async () => {
@@ -18,15 +14,19 @@ export const InspectorDashboard = () => {
             const res = await fetch('http://localhost:5000/api/batches/pending', {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            if (res.ok) setBatches(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                setBatches(data);
+            }
         } catch (error) {
             console.error("Lỗi tải danh sách:", error);
         }
     };
 
-    useEffect(() => { fetchPendingBatches(); }, []);
+    useEffect(() => {
+        fetchPendingBatches();
+    }, []);
 
-    // THÊM: Hàm xử lý quy trình 3 bước (IPFS -> Mint -> Database)
     const processApproveAndMint = async (batchId) => {
         try {
             // 1. Gắn IPFS
@@ -35,24 +35,33 @@ export const InspectorDashboard = () => {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             const pinData = await pinRes.json();
-            if (!pinData.success) throw new Error("Lỗi đẩy IPFS");
 
-            // 2. Ký ví MetaMask (dùng hàm handleMintNFT từ hook)
+            if (!pinRes.ok || !pinData.success) {
+                throw new Error(pinData.message || "Lỗi đẩy dữ liệu lên IPFS");
+            }
+
+            // 2. Ký ví MetaMask (Gọi Smart Contract)
+            // Đảm bảo hook useWeb3 của bạn xử lý và trả về { tokenId, txHash }
             const mintResult = await handleMintNFT(`ipfs://${pinData.ipfsHash}`);
-            if (!mintResult) return; // Người dùng từ chối ký
+            if (!mintResult) return; // Dừng nếu người dùng ấn "Từ chối" trên MetaMask
 
-            // 3. Báo Backend cập nhật MINTED
-            await fetch(`http://localhost:5000/api/batches/${batchId}/mint`, {
+            // 3. Báo Backend cập nhật trạng thái MINTED
+            const confirmRes = await fetch(`http://localhost:5000/api/batches/${batchId}/mint`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({ tokenId: mintResult.tokenId, txHash: mintResult.txHash })
+                body: JSON.stringify({
+                    tokenId: mintResult.tokenId,
+                    txHash: mintResult.txHash
+                })
             });
 
+            if (!confirmRes.ok) throw new Error("Lỗi khi lưu xác nhận NFT vào Database");
+
             alert(`🎉 Đã đúc NFT thành công! Token ID: ${mintResult.tokenId}`);
-            fetchPendingBatches(); // Làm mới giao diện
+            fetchPendingBatches(); // Làm mới giao diện, lô hàng sẽ biến mất
         } catch (err) {
             alert(`❌ Lỗi: ${err.message}`);
         }
@@ -68,29 +77,27 @@ export const InspectorDashboard = () => {
                     <p>Duyệt và đúc chứng nhận NFT lên Blockchain</p>
                 </header>
 
-                {/* 2. THÊM PHẦN NÀY: Dải 3 thẻ thống kê giống Figma */}
                 <div className={styles.statsGrid}>
-                    <StatCard title="Yêu cầu chờ duyệt" value="5" icon="!" type="warning" />
-                    <StatCard title="Đã từ chối" value="1" icon="✕" type="danger" />
-                    <StatCard title="Đã đúc NFT" value="12" icon="🏅" type="info" />
+                    <StatCard title="Yêu cầu chờ duyệt" value={batches.length} icon="!" type="warning" />
+                    <StatCard title="Đã từ chối" value="0" icon="✕" type="danger" />
+                    <StatCard title="Đã đúc NFT" value="-" icon="🏅" type="info" />
                 </div>
 
                 <section className={styles.batchSection}>
                     <h2>Lô hàng chờ kiểm định</h2>
                     <div className={styles.grid}>
-
-                        {/* Đây là đoạn code thực sự yêu cầu React vẽ các thẻ ra: */}
-                        {/* SỬA: Đổ dữ liệu thực tế từ Database */}
                         {batches.length === 0 ? <p>Không có lô hàng chờ duyệt.</p> :
                             batches.map((batch) => {
-                                // Ánh xạ dữ liệu DB sang cấu trúc của BatchCard Component
+                                // Fallback lấy tên sản phẩm an toàn
+                                const productName = batch.productId?.name || batch.productId?.productName || 'Sản phẩm chưa rõ';
+
                                 const displayData = {
                                     id: batch._id,
-                                    name: `Lô ${batch.productId?.productName || 'Sản phẩm'}`,
+                                    name: `Lô ${productName}`,
                                     status: 'Chờ kiểm định',
-                                    farmer: 'Xem chi tiết...',
-                                    location: 'Đã định vị',
-                                    cropType: batch.productId?.productName,
+                                    farmer: batch.inspectorId?.name || 'Nông dân ẩn danh',
+                                    location: 'Xem chi tiết nhật ký',
+                                    cropType: productName,
                                     area: 'N/A',
                                     quantity: `${batch.quantity} kg`,
                                     progress: 100
@@ -100,13 +107,12 @@ export const InspectorDashboard = () => {
                                     <BatchCard
                                         key={displayData.id}
                                         batch={displayData}
-                                        onMint={() => processApproveAndMint(batch._id)} // Truyền hàm xử lý mới vào đây
+                                        onMint={() => processApproveAndMint(batch._id)}
                                         isMinting={isMinting}
                                     />
                                 );
                             })
                         }
-
                     </div>
                 </section>
             </main>

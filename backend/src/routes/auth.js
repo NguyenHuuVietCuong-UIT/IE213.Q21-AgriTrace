@@ -7,6 +7,7 @@ router.post('/farmer/register', authController.registerFarmer);
 router.post('/farmer/login', authController.loginFarmer);
 
 // Routes cho Inspector (Web3)
+router.post('/inspector/register', authController.registerInspector);
 router.post('/inspector/request-nonce', authController.requestNonce);
 router.post('/inspector/verify', authController.verifyInspector);
 

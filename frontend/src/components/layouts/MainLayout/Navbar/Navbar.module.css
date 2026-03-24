@@ -72,6 +72,18 @@
 }
 
 .loginBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  appearance: none;
+
+  /* 🔥 FIX KHÁC BIỆT FONT */
+  font-family: inherit;     /* quan trọng */
+  font-size: 0.95rem;       /* set cố định */
+  line-height: 1;           /* tránh lệch chiều cao text */
+
   background-color: var(--nav-btn-green);
   color: white;
   border: none;
