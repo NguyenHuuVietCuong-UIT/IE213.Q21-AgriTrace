@@ -8,10 +8,6 @@ import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 import Register from './pages/Auth/Register/Register';
 import Login from './pages/Auth/Login/Login';
 
-import MainLayout from './components/layouts/MainLayout/MainLayout';
-import Home from './pages/Customer/Home/Home';
-import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
-import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 
 function App() {
   console.log("App AgriTrace đang chạy");
