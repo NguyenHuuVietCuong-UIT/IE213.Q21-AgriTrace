@@ -1,0 +1,182 @@
+/* --- PHẦN GIAO DIỆN THẺ (THU NHỎ) --- */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem; /* Đã giảm padding so với trước đây */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Thu nhỏ khoảng cách giữa các khối */
+  border: 1px solid #e5e7eb;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem; /* Giảm size font tiêu đề */
+  color: #111827;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Các nhãn (tags/badges) nhỏ lại */
+.tag, .badgeFarming, .badgePending, .badgeMinted {
+  font-size: 0.75rem; 
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.tag { background-color: #f3f4f6; color: #4b5563; }
+.badgeFarming { background-color: #d1fae5; color: #065f46; }
+.badgePending { background-color: #fef3c7; color: #92400e; }
+.badgeMinted { background-color: #dbeafe; color: #1e40af; }
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.progressBar {
+  height: 6px; /* Thanh tiến độ mỏng lại */
+  background-color: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #10b981;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Kích thước của tất cả các nút bấm được thu gọn */
+.btnPrimary, .btnOutline, .btnWait, .btnNFT, .btnLogs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.6rem; /* Giảm padding nút bấm */
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  flex: 1;
+  transition: all 0.2s;
+}
+
+.btnPrimary { background-color: #10b981; color: white; border: none; }
+.btnPrimary:hover { background-color: #059669; }
+
+.btnOutline { background-color: transparent; color: #10b981; border: 1px solid #10b981; }
+.btnOutline:hover { background-color: #ecfdf5; }
+
+.btnWait { background-color: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; cursor: not-allowed; }
+
+.btnNFT { background-color: #3b82f6; color: white; border: none; }
+.btnNFT:hover { background-color: #2563eb; }
+
+.btnLogs {
+  background-color: #f9fafb;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  margin-top: 0.2rem;
+}
+.btnLogs:hover { background-color: #f3f4f6; }
+
+/* --- PHẦN STYLE CHO DANH SÁCH NHẬT KÝ --- */
+.logsContainer {
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e5e7eb;
+  max-height: 220px; /* Giới hạn chiều cao, tự động có thanh cuộn nếu log quá dài */
+  overflow-y: auto; 
+}
+
+/* Style cho thanh cuộn (Scrollbar) của vùng log */
+.logsContainer::-webkit-scrollbar { width: 5px; }
+.logsContainer::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.logsContainer::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+.logsContainer::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.noLogs {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  text-align: center;
+  font-style: italic;
+  margin: 0;
+}
+
+.logsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.logItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.6rem;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  border-left: 3px solid #10b981; /* Đường kẻ viền xanh làm điểm nhấn */
+}
+
+.logHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logAction {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #1f2937;
+}
+
+.logDate {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.logLocation {
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.logImage {
+  margin-top: 0.5rem;
+  width: 100%;
+  height: 100px;
+  object-fit: cover; /* Hình ảnh vuông vắn không bị méo */
+  border-radius: 4px;
+}

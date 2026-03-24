@@ -1,4 +1,6 @@
 const Batch = require('../models/Batch');
+const Product = require('../models/Product');
+const Farm = require('../models/Farm');
 const { ethers } = require('ethers');
 
 // 1. Lấy chi tiết lô hàng công khai (dùng cho trang Tracking khi quét QR)

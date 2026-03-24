@@ -99,3 +99,39 @@ exports.verifyInspector = async (req, res) => {
         res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
     }
 };
+
+// Thêm hàm Đăng ký Kiểm định viên
+exports.registerInspector = async (req, res) => {
+    const { name, walletAddress } = req.body;
+
+    if (!name || !walletAddress) {
+        return res.status(400).json({ message: 'Vui lòng cung cấp tên và địa chỉ ví MetaMask' });
+    }
+
+    if (!ethers.isAddress(walletAddress)) {
+        return res.status(400).json({ message: 'Địa chỉ ví không hợp lệ' });
+    }
+
+    const address = walletAddress.toLowerCase();
+
+    try {
+        const existing = await User.findOne({ walletAddress: address });
+        if (existing) return res.status(400).json({ message: 'Ví này đã được đăng ký trong hệ thống' });
+
+        const inspector = await User.create({
+            name,
+            walletAddress: address,
+            role: 'INSPECTOR',
+            nonce: makeNonce()
+        });
+
+        res.status(201).json({
+            message: 'Đăng ký thành công',
+            user: { id: inspector._id, name: inspector.name, walletAddress: inspector.walletAddress, role: 'INSPECTOR' }
+        });
+    } catch (err) {
+        // Log lỗi ra console của backend để dễ debug
+        console.error("Lỗi khi tạo Inspector:", err);
+        res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
+    }
+};

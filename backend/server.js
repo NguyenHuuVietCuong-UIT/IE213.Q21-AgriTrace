@@ -42,7 +42,14 @@ async function start() {
     }
 
     await mongoose.connect(dbUri);
-    console.log('✅ MongoDB Atlas connected successfully');
+
+    // Lấy thông tin DB
+    const dbName = mongoose.connection.name;
+    const host = mongoose.connection.host;
+
+    console.log(`✅ MongoDB connected`);
+    console.log(`📦 Database: ${dbName}`);
+    console.log(`🌐 Host: ${host}`);
 
     app.listen(PORT, () => {
       console.log(`🚀 Server listening on http://localhost:${PORT}`);

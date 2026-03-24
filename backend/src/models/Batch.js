@@ -11,6 +11,7 @@ const logSchema = new mongoose.Schema({
 
 // Schema chính của Lô hàng
 const batchSchema = new mongoose.Schema({
+  farmerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
   inspectorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   harvestDate: { type: Date, required: true },
