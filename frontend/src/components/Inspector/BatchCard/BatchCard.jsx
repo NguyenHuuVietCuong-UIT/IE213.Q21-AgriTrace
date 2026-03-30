@@ -1,34 +1,36 @@
 import React from 'react';
 import styles from './BatchCard.module.css';
 
-export const BatchCard = ({ batch, onMint, isMinting }) => {
+const BatchCard = ({ batch, onMint, isMinting }) => {
+    // Truy xuất dữ liệu an toàn từ Object ID hoặc Populate
+    const productName = batch.productId?.name || "Sản phẩm nông sản";
+    const farmerName = batch.farmId?.owner?.name || "Nông dân";
+
     return (
         <div className={styles.card}>
             <div className={styles.header}>
-                <h3 className={styles.title}>{batch.name}</h3>
-                <span className={styles.statusBadge}>{batch.status}</span>
+                <h3 className={styles.title}>Lô {productName}</h3>
+                <span className={`${styles.statusBadge} ${styles[batch.status?.toLowerCase()] || ''}`}>
+                    {batch.status === 'LOCKED' ? 'Chờ duyệt' : batch.status}
+                </span>
             </div>
 
-            <p className={styles.info}>👤 {batch.farmer} | 📍 {batch.location}</p>
+            <p className={styles.info}>👤 {farmerName}</p>
 
             <div className={styles.gridInfo}>
-                <div><small>Loại cây</small><p>{batch.cropType}</p></div>
-                <div><small>Diện tích</small><p>{batch.area}</p></div>
-                <div><small>Sản lượng</small><p>{batch.quantity}</p></div>
-            </div>
-
-            <div className={styles.progressArea}>
-                <div className={styles.progressText}>Tiến độ <span>{batch.progress}%</span></div>
-                <div className={styles.progressBar}><div className={styles.progressFill} style={{ width: `${batch.progress}%` }}></div></div>
+                <div><small>Trọng lượng</small><p>{batch.quantity} kg</p></div>
+                <div><small>Mã lô</small><p>{batch._id?.slice(-6).toUpperCase()}</p></div>
             </div>
 
             <button
                 className={styles.mintBtn}
-                onClick={() => onMint(batch.id)}
+                onClick={() => onMint(batch._id)}
                 disabled={isMinting}
             >
-                {isMinting ? '⏳ Đang xử lý Blockchain...' : 'Xem hồ sơ & Duyệt'}
+                {isMinting ? '⏳ Đang đúc NFT...' : 'Phê duyệt & Đúc NFT'}
             </button>
         </div>
     );
 };
+
+export default BatchCard;

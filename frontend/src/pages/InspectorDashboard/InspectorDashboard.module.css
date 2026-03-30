@@ -1,14 +1,104 @@
-.layout { display: flex; min-height: 100vh; background-color: #F8FAFC; font-family: 'Inter', sans-serif; }
-.mainContent { margin-left: 260px; padding: 40px 60px; flex: 1; }
-.header h1 { font-size: 2.2rem; font-weight: 700; color: #111827; margin: 0; }
-.header p { color: #6B7280; font-size: 1.1rem; margin-top: 8px; }
-.batchSection { margin-top: 40px; }
-.batchSection h2 { font-size: 1.5rem; color: #111827; margin-bottom: 24px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+/* Layout tổng: xếp theo chiều dọc (Cột) */
+.dashboardWrapper {
+  display: flex;
+  flex-direction: column; 
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Nội dung chính căn giữa màn hình, không còn bị đẩy sang phải */
+.mainContent {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.header p {
+  color: #64748b;
+  margin: 0;
+}
+
+/* Giao diện 4 thẻ thống kê */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-top: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.iconWrapper {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blue { background: #eff6ff; color: #3b82f6; }
+.yellow { background: #fefce8; color: #eab308; }
+.green { background: #f0fdf4; color: #22c55e; }
+.red { background: #fef2f2; color: #ef4444; }
+
+.statInfo p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.statInfo h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Khu vực danh sách Batch */
+.batchSection {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.batchSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.batchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.loadingText, .emptyText {
+  text-align: center;
+  color: #64748b;
+  padding: 3rem 0;
+  font-weight: 500;
 }
