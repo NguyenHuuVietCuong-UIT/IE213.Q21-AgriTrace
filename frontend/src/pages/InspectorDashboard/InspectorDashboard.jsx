@@ -135,23 +135,26 @@ export const InspectorDashboard = () => {
                     <h2>Danh sách lô hàng cần phê duyệt</h2>
                     {loading ? (
                         <div className={styles.loadingArea}>Đang tải dữ liệu...</div>
-                    ) : batches.length === 0 ? (
-                        <p className={styles.emptyText}>Hiện không có lô hàng nào cần xử lý.</p>
+                    ) : batches.filter(b => b.status === 'LOCKED').length === 0 ? (
+                        <p className={styles.emptyText}>Hiện không có lô hàng nào cần phê duyệt.</p>
                     ) : (
                         <div className={styles.batchGrid}>
-                            {batches.map(batch => (
-                                <BatchCard
-                                    key={batch._id}
-                                    batch={batch}
-                                    onMint={handleApproveAndMint}
-                                    isMinting={isMinting}
-                                />
-                            ))}
+                            {/* Chỉ map và hiển thị những lô hàng có trạng thái LOCKED */}
+                            {batches
+                                .filter(batch => batch.status === 'LOCKED')
+                                .map(batch => (
+                                    <BatchCard
+                                        key={batch._id}
+                                        batch={batch}
+                                        onMint={handleApproveAndMint}
+                                        isMinting={isMinting}
+                                    />
+                                ))}
                         </div>
                     )}
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 };
 

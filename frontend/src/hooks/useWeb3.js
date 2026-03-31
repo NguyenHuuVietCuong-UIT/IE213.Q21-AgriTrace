@@ -1,27 +1,30 @@
 import { useState } from 'react';
-import { ethers } from 'ethers'; // THÊM: Thư viện kết nối Blockchain
+import { ethers } from 'ethers';
 
-// THÊM: Khai báo địa chỉ và ABI tối giản của Smart Contract (Có thể đưa vào file .env sau)
-const CONTRACT_ADDRESS = import.meta.env.VITE_NFT_CONTRACT_ADDRESS || "0x_ĐIỀN_ĐỊA_CHỈ_CONTRACT_VÀO_ĐÂY";
+const CONTRACT_ADDRESS = import.meta.env.VITE_NFT_CONTRACT_ADDRESS || "0x_ĐIỀN_ĐỊA_CHỈ_CONTRACT_MỚI_VÀO_ĐÂY";
+
+// THÊM updateBatch VÀO ABI
 const MINIMAL_ABI = [
-    "function mintBatchNFT(string memory tokenURI) public returns (uint256)",
-    "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+    "function mintBatch(string memory _ipfsHash) public",
+    "function updateBatch(uint _tokenId, string memory _newIpfsHash) public",
+    "event BatchMinted(uint tokenId, address owner, string ipfsHash)",
+    "event BatchUpdated(uint tokenId, address updater, string newIpfsHash)"
 ];
 
 export const useWeb3 = () => {
     const [account, setAccount] = useState(null);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [isMinting, setIsMinting] = useState(false); // Trạng thái loading khi đúc NFT
+    const [isMinting, setIsMinting] = useState(false);
 
-    // Hàm gọi MetaMask hiện lên
+    // ĐÃ THÊM: Khai báo state để quản lý trạng thái loading khi cập nhật
+    const [isUpdating, setIsUpdating] = useState(false);
+
     const connectWallet = async () => {
         setIsConnecting(true);
         try {
-            // Kiểm tra xem trình duyệt đã cài MetaMask chưa
             if (typeof window.ethereum !== 'undefined') {
-                // Yêu cầu người dùng kết nối ví
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                setAccount(accounts[0]); // Lưu địa chỉ ví lại (VD: 0x123...abc)
+                setAccount(accounts[0]);
             } else {
                 alert("🦊 Vui lòng cài đặt tiện ích mở rộng MetaMask trên trình duyệt để tiếp tục!");
             }
@@ -32,12 +35,10 @@ export const useWeb3 = () => {
         }
     };
 
-    // Hàm xử lý khi bấm nút "Duyệt & Đúc NFT"
-    // SỬA: Thay thế logic giả lập bằng tương tác Blockchain thật
     const handleMintNFT = async (tokenURI) => {
         if (!account) {
             alert("⚠️ Vui lòng kết nối ví MetaMask ở góc trái trước khi đúc NFT!");
-            return null; // Trả về null nếu chưa kết nối ví
+            return null;
         }
 
         setIsMinting(true);
@@ -46,22 +47,20 @@ export const useWeb3 = () => {
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
 
-            // 1. Gọi Blockchain đúc NFT
-            const tx = await contract.mintBatchNFT(tokenURI);
-            const receipt = await tx.wait(); // Chờ giao dịch hoàn tất
+            const tx = await contract.mintBatch(tokenURI);
+            const receipt = await tx.wait();
 
-            // 2. Bóc tách Token ID từ sự kiện sinh ra
             let tokenId = null;
             for (const log of receipt.logs) {
                 try {
                     const parsedLog = contract.interface.parseLog(log);
-                    if (parsedLog && parsedLog.name === 'Transfer') {
-                        tokenId = parsedLog.args.tokenId.toString();
+                    if (parsedLog && parsedLog.name === 'BatchMinted') {
+                        tokenId = parsedLog.args[0].toString();
                     }
                 } catch (e) { /* Bỏ qua log rác */ }
             }
 
-            return { txHash: receipt.hash, tokenId }; // Trả về kết quả cho Dashboard xử lý tiếp
+            return { txHash: receipt.hash, tokenId };
         } catch (error) {
             console.error("Lỗi đúc NFT:", error);
             alert("❌ Có lỗi xảy ra khi gọi ví đúc NFT.");
@@ -71,5 +70,42 @@ export const useWeb3 = () => {
         }
     };
 
-    return { account, isConnecting, isMinting, connectWallet, handleMintNFT };
+    const handleUpdateNFT = async (tokenId, newIpfsHash) => {
+        if (!account) {
+            alert("⚠️ Vui lòng kết nối ví MetaMask!");
+            return null;
+        }
+
+        setIsUpdating(true); // Đã có thể gọi hàm này vì state đã được khai báo
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
+
+            const tx = await contract.updateBatch(tokenId, newIpfsHash);
+            const receipt = await tx.wait();
+
+            return { txHash: receipt.hash, success: true };
+        } catch (error) {
+            console.error("Lỗi cập nhật NFT:", error);
+            if (error.message.includes("Chi chu so huu moi duoc cap nhat")) {
+                alert("❌ Bạn không có quyền cập nhật lô hàng này!");
+            } else {
+                alert("❌ Có lỗi xảy ra khi gọi ví cập nhật NFT.");
+            }
+            return null;
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    return {
+        account,
+        isConnecting,
+        isMinting,
+        isUpdating,
+        connectWallet,
+        handleMintNFT,
+        handleUpdateNFT
+    };
 };
