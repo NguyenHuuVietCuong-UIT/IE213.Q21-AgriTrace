@@ -73,6 +73,7 @@ const BatchCard = ({ batch, onAddActivity, onComplete }) => {
           ) : (
             <ul className={styles.logsList}>
               {batch.logs.map((log, index) => (
+
                 <li key={index} className={styles.logItem}>
                   <div className={styles.logHeader}>
                     <span className={styles.logAction}>{log.action}</span>
@@ -80,6 +81,7 @@ const BatchCard = ({ batch, onAddActivity, onComplete }) => {
                       {new Date(log.timestamp).toLocaleDateString('vi-VN')}
                     </span>
                   </div>
+                  
                   <div className={styles.logLocation}>📍 {log.location}</div>
                   {log.imageUrl && (
                     <img src={log.imageUrl} alt="Hình ảnh hoạt động" className={styles.logImage} />
