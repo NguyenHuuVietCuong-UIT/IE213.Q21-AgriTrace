@@ -66,9 +66,12 @@ exports.addLog = async (req, res) => {
 
 exports.getPendingBatches = async (req, res) => {
     try {
-        const batches = await Batch.find({ status: 'LOCKED' })
+        // Lọc các lô hàng có inspectorId trùng với tài khoản Inspector đang đăng nhập
+        const batches = await Batch.find({ inspectorId: req.user._id })
             .populate('productId')
-            .populate('inspectorId', 'name email');
+            .populate('inspectorId', 'name email')
+            .sort({ updatedAt: -1 }); // Sắp xếp lô hàng mới cập nhật lên đầu
+
         res.json(batches);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -96,7 +99,6 @@ exports.pinToIPFS = async (req, res) => {
         const pinResult = await pinJsonToIPFS({ pinataContent: dataToPin });
 
         batch.ipfsHash = pinResult.IpfsHash;
-        batch.inspectorId = req.user._id; // Gắn ID người kiểm định lúc duyệt
         await batch.save();
 
         res.json({ success: true, ipfsHash: batch.ipfsHash });
@@ -126,6 +128,8 @@ exports.confirmMint = async (req, res) => {
 
 exports.lockBatch = async (req, res) => {
     const { batchId } = req.params;
+    // Lấy thêm inspectorId do Nông dân gửi lên từ Frontend khi bấm khóa lô hàng
+    const { inspectorId } = req.body;
 
     try {
         const batch = await Batch.findById(batchId);
@@ -141,12 +145,77 @@ exports.lockBatch = async (req, res) => {
             return res.status(400).json({ message: 'Lô hàng không ở trạng thái có thể khóa' });
         }
 
-        // Chuyển trạng thái sang LOCKED (Chờ kiểm định)
+        if (!inspectorId) {
+            return res.status(400).json({ message: 'Vui lòng chỉ định người kiểm định (inspectorId) cho lô hàng này' });
+        }
+
+        // Gán Inspector và Chuyển trạng thái sang LOCKED (Chờ kiểm định)
+        batch.inspectorId = inspectorId;
         batch.status = 'LOCKED';
         await batch.save();
 
         res.json({ message: 'Đã gửi yêu cầu kiểm định thành công', batch });
     } catch (err) {
         res.status(500).json({ message: 'Lỗi khi khóa lô hàng', error: err.message });
+    }
+};
+
+// ABI rút gọn chứa hàm updateShipping
+const MINIMAL_ABI = [
+    "function updateShipping(uint _tokenId, string memory _newIpfsHash) public"
+];
+
+exports.updateShippingLog = async (req, res) => {
+    const { batchId } = req.params;
+    const { location, status } = req.body; // Dữ liệu vận chuyển mới
+
+    try {
+        const batch = await Batch.findById(batchId).populate('productId');
+        if (!batch || batch.status !== 'MINTED') {
+            return res.status(400).json({ message: 'Lô hàng chưa đúc NFT hoặc không tồn tại' });
+        }
+
+        // 1. Thêm log vận chuyển vào DB
+        batch.logs.push({
+            action: status,
+            actorId: null, // Hệ thống tự cập nhật
+            location: location,
+            timestamp: new Date()
+        });
+        await batch.save();
+
+        // 2. Gom toàn bộ cục Data mới để Pin lại lên IPFS
+        const dataToPin = {
+            batchId: batch._id,
+            product: batch.productId,
+            harvestDate: batch.harvestDate,
+            logs: batch.logs // Lúc này logs đã có thêm bước vận chuyển
+        };
+        const pinResult = await pinJsonToIPFS({ pinataContent: dataToPin });
+        const newIpfsHash = pinResult.IpfsHash;
+
+        // 3. Backend tự động gọi Smart Contract
+        // Khởi tạo provider từ RPC URL (Sepolia)
+        const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+
+        // Khởi tạo ví từ Private Key (Ví này sẽ trả tiền Gas)
+        const wallet = new ethers.Wallet(process.env.SYSTEM_PRIVATE_KEY, provider);
+
+        // Kết nối contract
+        const contract = new ethers.Contract(process.env.SMART_CONTRACT_ADDRESS, MINIMAL_ABI, wallet);
+
+        // Gọi hàm update trên Blockchain
+        const tx = await contract.updateShipping(batch.tokenId, newIpfsHash);
+        await tx.wait(); // Đợi block được đào
+
+        // 4. Lưu lại hash mới vào DB
+        batch.ipfsHash = newIpfsHash;
+        await batch.save();
+
+        res.json({ success: true, message: 'Cập nhật vận chuyển lên Blockchain thành công!', newIpfsHash });
+
+    } catch (err) {
+        console.error("Lỗi cập nhật:", err);
+        res.status(500).json({ message: 'Lỗi hệ thống', error: err.message });
     }
 };

@@ -1,14 +1,95 @@
-.sidebar { width: 260px; background: white; padding: 30px 20px; height: 100vh; position: fixed; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column; }
-.logo { display: flex; align-items: center; gap: 12px; margin-bottom: 50px; }
+/* Đổi từ chiều dọc thành thanh ngang ở trên cùng */
+.sidebar { 
+    width: 100%; 
+    height: 80px; /* Thay vì 100vh */
+    background: white; 
+    padding: 0 40px; /* Padding trái phải */
+    position: sticky; /* Giữ cố định trên cùng khi cuộn */
+    top: 0;
+    border-bottom: 1px solid #e5e7eb; /* Đổi border-right thành border-bottom */
+    display: flex; 
+    flex-direction: row; /* Thay vì column */
+    align-items: center; 
+    justify-content: space-between; /* Dàn đều 3 phần ra 3 khu vực */
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+/* Phần Logo */
+.logo { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin-bottom: 0; /* Xóa khoảng cách dưới (50px cũ) */
+}
 .logoTextMain { font-size: 1.5rem; font-weight: 700; color: #111827; }
 .logoTextSub { font-size: 0.8rem; color: #6B7280; }
-.menu { flex-grow: 1; }
-.menuItem { display: block; padding: 12px 16px; border-radius: 12px; color: #6B7280; text-decoration: none; font-weight: 500; margin-bottom: 8px; }
-.menuItem.active { background-color: #ECFDF5; color: #1BFA49; }
-.connectedWallet { background: #F1F5F9; padding: 16px; border-radius: 12px; }
+
+/* Phần Menu nằm ngang */
+.menu { 
+    display: flex; 
+    gap: 10px; /* Khoảng cách giữa các mục menu */
+}
+.menuItem { 
+    display: block; 
+    padding: 10px 16px; 
+    border-radius: 12px; 
+    color: #6B7280; 
+    text-decoration: none; 
+    font-weight: 500; 
+    margin-bottom: 0; /* Bỏ margin-bottom cũ */
+    transition: background-color 0.2s;
+}
+.menuItem:hover {
+    background-color: #f3f4f6;
+}
+.menuItem.active { 
+    background-color: #ECFDF5; 
+    color: #1BFA49; 
+}
+
+/* Phần ví MetaMask */
+.connectedWallet { 
+    background: #F1F5F9; 
+    padding: 8px 16px; /* Chỉnh lại padding cho gọn */
+    border-radius: 12px; 
+    display: flex;
+    align-items: center;
+}
 .walletHeader { display: flex; gap: 12px; align-items: center; }
-.metaMaskContainer { background: white; padding: 8px; border-radius: 8px; }
-.walletTextMain { font-size: 0.85rem; font-weight: 600; color: #6B7280; }
-.walletTextSub { font-size: 0.8rem; font-weight: 600; color: #111827; }
-.network { margin-left: 6px; color: #2A9D8F; font-size: 0.75rem; }
-.connectBtn { background: #2A9D8F; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; margin-top: 4px; }
+.metaMaskContainer { 
+    background: white; 
+    padding: 6px; 
+    border-radius: 8px; 
+    display: flex;
+    align-items: center;
+}
+.walletTextMain { font-size: 0.75rem; font-weight: 600; color: #6B7280; }
+.walletTextSub { 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: #111827; 
+    display: flex;
+    align-items: center;
+}
+.network { 
+    margin-left: 8px; 
+    background-color: #e0f2f1; /* Nền xanh nhạt cho tag Sepolia */
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #2A9D8F; 
+    font-size: 0.7rem; 
+}
+.connectBtn { 
+    background: #2A9D8F; 
+    color: white; 
+    border: none; 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 0.8rem; 
+    margin-top: 4px; 
+}
+.connectBtn:hover {
+    background: #21867a;
+}

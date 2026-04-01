@@ -78,15 +78,30 @@ const FarmerDashboard = () => {
 
   // 2. TÍNH NĂNG GỬI YÊU CẦU KIỂM ĐỊNH (KHÓA LÔ HÀNG)
   const handleComplete = async (id) => {
+    // Yêu cầu Nông dân nhập ID của người kiểm định (Trong thực tế nên làm 1 dropdown list để chọn)
+    const inspectorId = window.prompt("Nhập ID của người kiểm định (Inspector ID) cho lô hàng này:");
+
+    if (!inspectorId) {
+      alert("Bạn phải nhập hoặc cung cấp ID của người kiểm định để tiếp tục!");
+      return;
+    }
+
     if (window.confirm("Xác nhận hoàn tất canh tác và gửi yêu cầu kiểm định? (Bạn sẽ không thể thêm nhật ký nữa)")) {
       try {
         const token = localStorage.getItem('token');
         const response = await fetch(`${API_URL}/${id}/lock`, {
           method: 'PUT',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: {
+            'Content-Type': 'application/json', // Cần thêm header này để gửi JSON
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ inspectorId }) // Gửi inspectorId lên Backend
         });
 
-        if (!response.ok) throw new Error("Lỗi khi gửi yêu cầu");
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.message || "Lỗi khi gửi yêu cầu");
+        }
 
         alert("Đã gửi yêu cầu kiểm định thành công!");
         fetchMyBatches(); // Load lại data

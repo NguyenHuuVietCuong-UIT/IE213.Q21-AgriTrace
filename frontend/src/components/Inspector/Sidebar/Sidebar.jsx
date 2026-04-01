@@ -5,6 +5,7 @@ import { AgriTraceIcon, MetaMaskIcon } from '../Icons/Icons';
 export const Sidebar = ({ account, onConnect, isConnecting }) => {
     return (
         <div className={styles.sidebar}>
+            {/* Logo */}
             <div className={styles.logo}>
                 <AgriTraceIcon />
                 <div>
@@ -13,12 +14,14 @@ export const Sidebar = ({ account, onConnect, isConnecting }) => {
                 </div>
             </div>
 
+            {/* Menu giữa */}
             <nav className={styles.menu}>
                 <a href="#" className={`${styles.menuItem} ${styles.active}`}>🏠 Tổng quan</a>
                 <a href="#" className={styles.menuItem}>📅 Lịch sử kiểm định</a>
                 <a href="#" className={styles.menuItem}>⚙️ Cài đặt ví</a>
             </nav>
 
+            {/* Ví MetaMask bên phải */}
             <div className={styles.connectedWallet}>
                 <div className={styles.walletHeader}>
                     <div className={styles.metaMaskContainer}><MetaMaskIcon /></div>
