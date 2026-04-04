@@ -12,6 +12,7 @@ const mongoose = require('mongoose');
 const userRoutes = require('./src/routes/user');
 const batchRoutes = require('./src/routes/batch');
 const publicRoutes = require('./src/routes/public');
+const resourceRoutes = require('./src/routes/resource');
 
 // Khởi tạo ứng dụng Express
 const app = express();
@@ -36,7 +37,7 @@ app.get('/api/ping', (req, res) => {
 app.use('/api/user', userRoutes);       // Đăng ký, đăng nhập, nonce...
 app.use('/api/batches', batchRoutes);   // Tạo lô hàng, thêm nhật ký, update IPFS...
 app.use('/api/public', publicRoutes);   // Tracking public (có gắn rate-limit ở trong)
-app.use('/api/resources', require('./routes/resourceRoutes')); // Các route liên quan đến tài nguyên (nông trại, sản phẩm, kiểm định viên)
+app.use('/api/resources', resourceRoutes); // Các route liên quan đến tài nguyên (nông trại, sản phẩm, kiểm định viên)
 
 // ============================================================================
 // 4. KẾT NỐI MONGODB & KHỞI CHẠY SERVER
