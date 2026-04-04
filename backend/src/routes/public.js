@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const publicController = require('../controllers/publicController');
+const { trackingLimiter } = require('../middlewares/auth');
 
-// Route lấy thông tin hiển thị Timeline
-router.get('/batches/:id', publicController.getBatchPublicDetail);
-
-// Route kiểm chứng Blockchain (Nút "Verify" trên giao diện của Member 4/5)
-router.get('/batches/:id/verify-blockchain', publicController.verifyOnChain);
+// Khách vãng lai quét mã QR, không cần đăng nhập nhưng bị giới hạn tốc độ chống spam
+router.get('/batches/:id', trackingLimiter, publicController.getBatchFromIPFS);
 
 module.exports = router;
