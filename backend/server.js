@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 // 1. IMPORT CÁC ROUTES
 // ============================================================================
 // (Giả sử bạn đã tạo các file này trong thư mục src/routes)
-const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./src/routes/user');
 const batchRoutes = require('./src/routes/batch');
 const publicRoutes = require('./src/routes/public');
 
@@ -33,9 +33,10 @@ app.get('/api/ping', (req, res) => {
 });
 
 // Các API nghiệp vụ
-app.use('/api/auth', authRoutes);       // Đăng ký, đăng nhập, nonce...
+app.use('/api/user', userRoutes);       // Đăng ký, đăng nhập, nonce...
 app.use('/api/batches', batchRoutes);   // Tạo lô hàng, thêm nhật ký, update IPFS...
 app.use('/api/public', publicRoutes);   // Tracking public (có gắn rate-limit ở trong)
+app.use('/api/resources', require('./routes/resourceRoutes')); // Các route liên quan đến tài nguyên (nông trại, sản phẩm, kiểm định viên)
 
 // ============================================================================
 // 4. KẾT NỐI MONGODB & KHỞI CHẠY SERVER

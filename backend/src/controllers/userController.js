@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { ethers } = require('ethers');
-const userDao = require('../daos/authDAO');
+const userDao = require('../daos/userDAO');
 
 // ==========================================
 // CÁC HÀM BỔ TRỢ (HELPER FUNCTIONS)

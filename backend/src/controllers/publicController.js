@@ -1,5 +1,5 @@
 const { ethers } = require('ethers');
-const publicDao = require('../daos/publicDao');
+const publicDao = require('../daos/publicDAO');
 // Import hàm đọc IPFS mới viết
 const { fetchJsonFromIPFS } = require('../utils/ipfs');
 

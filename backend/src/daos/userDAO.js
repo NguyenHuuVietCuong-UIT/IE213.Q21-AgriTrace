@@ -60,6 +60,25 @@ const userDao = {
      */
     findByWalletAndRole: async (walletAddress, role) => {
         return await User.findOne({ walletAddress, role });
+    },
+
+    searchInspectors: async (keyword) => {
+        const query = { role: 'INSPECTOR' }; // Luôn giới hạn chỉ tìm Inspector
+
+        if (keyword) {
+            if (mongoose.Types.ObjectId.isValid(keyword)) {
+                query._id = keyword; // Tìm theo MongoDB ID
+            } else if (keyword.startsWith('0x')) {
+                // Tìm theo ví MetaMask (Khớp chính xác nhưng bỏ qua hoa/thường)
+                query.walletAddress = { $regex: new RegExp(`^${keyword}$`, 'i') };
+            } else {
+                // Tìm theo tên
+                query.name = { $regex: keyword, $options: 'i' };
+            }
+        }
+
+        // Không trả về passwordHash hay nonce để bảo mật
+        return await User.find(query).select('name email walletAddress role').limit(20);
     }
 };
 
