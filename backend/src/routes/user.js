@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
+const authController = require('../controllers/userController');
 
 // Routes cho Farmer (Web2)
 router.post('/farmer/register', authController.registerFarmer);

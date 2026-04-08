@@ -3,13 +3,13 @@ const router = express.Router();
 const batchController = require('../controllers/batchController');
 const { verifyToken, requireRole } = require('../middlewares/auth');
 
-// LUỒNG NÔNG DÂN
+// Routes cho Farmer (Web2)
 router.get('/mine', verifyToken, requireRole('FARMER'), batchController.getMyBatches);
 router.post('/', verifyToken, requireRole('FARMER'), batchController.createBatch);
 router.post('/:batchId/logs', verifyToken, requireRole('FARMER'), batchController.addLog);
 router.put('/:batchId/lock', verifyToken, requireRole('FARMER'), batchController.lockBatch);
 
-// LUỒNG KIỂM ĐỊNH
+// Routes cho Inspector (Web3)
 router.get('/pending', verifyToken, requireRole('INSPECTOR'), batchController.getPendingBatches);
 router.post('/:batchId/pin', verifyToken, requireRole('INSPECTOR'), batchController.pinToIPFS);
 router.post('/:batchId/mint', verifyToken, requireRole('INSPECTOR'), batchController.confirmMint);

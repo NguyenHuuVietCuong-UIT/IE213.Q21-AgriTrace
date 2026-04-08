@@ -1,83 +1,62 @@
-const Batch = require('../models/Batch');
-const Product = require('../models/Product');
-const Farm = require('../models/Farm');
 const { ethers } = require('ethers');
+const publicDao = require('../daos/publicDAO');
+// Import hàm đọc IPFS mới viết
+const { fetchJsonFromIPFS } = require('../utils/ipfs');
 
-// 1. Lấy chi tiết lô hàng công khai (dùng cho trang Tracking khi quét QR)
-exports.getBatchPublicDetail = async (req, res) => {
-    try {
+const PUBLIC_CONTRACT_ABI = [
+    "function batches(uint256) view returns (uint256 tokenId, string ipfsHash, address owner)"
+];
+
+const publicController = {
+    getBatchFromIPFS: async (req, res) => {
         const { id } = req.params;
 
-        // Truy vấn lồng cực sâu để lấy thông tin Lô hàng -> Sản phẩm -> Nông trại -> Chủ nông trại
-        const batch = await Batch.findById(id)
-            .populate({
-                path: 'productId',
-                populate: {
-                    path: 'farmId',
-                    populate: { path: 'ownerId', select: 'name email' }
-                }
-            })
-            .populate('inspectorId', 'name email walletAddress');
+        try {
+            // Bước 1: Tra cứu Token ID từ DB
+            const dbBatch = await publicDao.getTrackingId(id);
+            if (!dbBatch || dbBatch.status !== 'MINTED' || !dbBatch.tokenId) {
+                return res.status(404).json({ message: 'Lô hàng không tồn tại hoặc chưa được đúc NFT.' });
+            }
 
-        if (!batch) return res.status(404).json({ message: 'Không tìm thấy thông tin lô hàng' });
+            // Bước 2: Lấy IPFS Hash từ Smart Contract
+            const provider = new ethers.JsonRpcProvider(process.env.ETH_RPC_URL);
+            const contract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, PUBLIC_CONTRACT_ABI, provider);
 
-        // Trả về dữ liệu đã được gộp chuẩn xác để Frontend vẽ Timeline
-        res.json({
-            id: batch._id,
-            product: batch.productId, // Chứa thông tin tên sản phẩm, mô tả, hình đại diện
-            harvestDate: batch.harvestDate,
-            quantity: batch.quantity,
-            status: batch.status,
-            logs: batch.logs,         // Chứa mảng nhật ký canh tác (có hình ảnh)
-            ipfsHash: batch.ipfsHash,
-            tokenId: batch.tokenId,
-            txHash: batch.txHash,
-            inspector: batch.inspectorId,
-            createdAt: batch.createdAt
-        });
-    } catch (err) {
-        res.status(500).json({ message: 'Lỗi khi truy xuất dữ liệu', error: err.message });
+            const contractData = await contract.batches(dbBatch.tokenId);
+            const onChainIpfsHash = contractData.ipfsHash;
+
+            if (!onChainIpfsHash) {
+                return res.status(404).json({ message: 'Dữ liệu Blockchain bị trống.' });
+            }
+
+            // ========================================================
+            // BƯỚC 3: TẢI DỮ LIỆU TỪ IPFS (Siêu gọn gàng nhờ Utils)
+            // ========================================================
+            let agriculturalData;
+            try {
+                // Chỉ cần gọi 1 dòng duy nhất!
+                agriculturalData = await fetchJsonFromIPFS(onChainIpfsHash);
+            } catch (ipfsErr) {
+                return res.status(503).json({ message: ipfsErr.message });
+            }
+
+            // Bước 4: Trả về cho Frontend
+            return res.json({
+                success: true,
+                metaData: {
+                    tokenId: contractData.tokenId.toString(),
+                    contractAddress: process.env.NFT_CONTRACT_ADDRESS,
+                    ipfsHash: onChainIpfsHash,
+                    mintTxHash: dbBatch.txHash,
+                    ownerWallet: contractData.owner
+                },
+                productData: agriculturalData
+            });
+
+        } catch (err) {
+            return res.status(500).json({ message: 'Lỗi hệ thống', error: err.message });
+        }
     }
 };
 
-// 2. Kiểm chứng dữ liệu trực tiếp từ Blockchain
-exports.verifyOnChain = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const batch = await Batch.findById(id);
-
-        if (!batch || batch.status !== 'MINTED') {
-            return res.status(400).json({ message: 'Lô hàng chưa được đúc NFT để kiểm chứng' });
-        }
-
-        const rpcUrl = process.env.ETH_RPC_URL;
-        const contractAddress = process.env.NFT_CONTRACT_ADDRESS;
-
-        if (!rpcUrl || !contractAddress) {
-            return res.status(500).json({ message: 'Thiếu cấu hình kết nối Blockchain (RPC/Contract Address)' });
-        }
-
-        // ABI rút gọn để đọc tokenURI
-        const abi = ['function tokenURI(uint256 tokenId) view returns (string)'];
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const contract = new ethers.Contract(contractAddress, abi, provider);
-
-        // Gọi hàm tokenURI trên Smart Contract
-        const onChainUri = await contract.tokenURI(BigInt(batch.tokenId));
-
-        // So sánh: tùy thuộc vào cách Smart Contract lưu, nó có thể là "Hash" hoặc "ipfs://Hash"
-        const matched = onChainUri === batch.ipfsHash || onChainUri === `ipfs://${batch.ipfsHash}`;
-
-        return res.json({
-            batchId: batch._id,
-            tokenId: batch.tokenId,
-            txHash: batch.txHash,
-            dbIpfsHash: batch.ipfsHash,
-            onChainUri,
-            matched // Nếu true -> Dữ liệu Blockchain hoàn toàn khớp với Database
-        });
-    } catch (err) {
-        return res.status(500).json({ message: 'Không thể kết nối với Blockchain để kiểm chứng', error: err.message });
-    }
-};
+module.exports = publicController;

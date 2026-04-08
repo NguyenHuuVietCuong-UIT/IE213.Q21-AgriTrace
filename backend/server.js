@@ -1,63 +1,70 @@
+// Đọc các biến môi trường từ file .env ngay từ dòng đầu tiên
 require('dotenv').config();
+
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
-// CHỈNH SỬA: Đã xóa dòng require mongodb-memory-server gây lỗi
-
-const authRoutes = require('./src/routes/auth');
+// ============================================================================
+// 1. IMPORT CÁC ROUTES
+// ============================================================================
+// (Giả sử bạn đã tạo các file này trong thư mục src/routes)
+const userRoutes = require('./src/routes/user');
 const batchRoutes = require('./src/routes/batch');
 const publicRoutes = require('./src/routes/public');
+const resourceRoutes = require('./src/routes/resource');
 
+// Khởi tạo ứng dụng Express
 const app = express();
+
+// ============================================================================
+// 2. CẤU HÌNH MIDDLEWARE TOÀN CỤC
+// ============================================================================
+// Bật CORS để cho phép Frontend (React/Next.js) gọi API ở port khác mà không bị chặn
 app.use(cors());
-app.use(express.json({ limit: '15mb' }));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/batches', batchRoutes);
-app.use('/api/public', publicRoutes);
+// Cho phép Express tự động parse dữ liệu JSON gửi lên từ req.body
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({ message: 'AgriTrace backend running' });
+// ============================================================================
+// 3. GẮN ROUTES VÀO ỨNG DỤNG
+// ============================================================================
+app.get('/api/ping', (req, res) => {
+    res.json({ success: true, message: 'AgriTrace Backend đang hoạt động ổn định! 🚀' });
 });
 
-app.use((err, req, res, next) => {
-  console.error(err);
-  return res.status(err.status || 500).json({
-    message: err.message || 'Internal server error'
-  });
-});
+// Các API nghiệp vụ
+app.use('/api/user', userRoutes);       // Đăng ký, đăng nhập, nonce...
+app.use('/api/batches', batchRoutes);   // Tạo lô hàng, thêm nhật ký, update IPFS...
+app.use('/api/public', publicRoutes);   // Tracking public (có gắn rate-limit ở trong)
+app.use('/api/resources', resourceRoutes); // Các route liên quan đến tài nguyên (nông trại, sản phẩm, kiểm định viên)
 
-const PORT = process.env.PORT || 5000; // Đổi mặc định thành 5000 cho khớp với các hướng dẫn trước
+// ============================================================================
+// 4. KẾT NỐI MONGODB & KHỞI CHẠY SERVER
+// ============================================================================
+const PORT = process.env.PORT || 8080;
+const MONGO_URI = process.env.MONGO_URI;
 
-async function start() {
-  try {
-    // CHỈNH SỬA: Chỉ giữ lại logic kết nối trực tiếp tới MongoDB Atlas
-    // Đảm bảo trong file .env bạn đặt tên biến là MONGODB_URI hoặc MONGO_URI cho khớp
-    const dbUri = process.env.MONGODB_URI || process.env.MONGO_URI;
-
-    if (!dbUri) {
-      console.error('LỖI: Chưa cấu hình MONGODB_URI trong file .env');
-      process.exit(1);
-    }
-
-    await mongoose.connect(dbUri);
-
-    // Lấy thông tin DB
-    const dbName = mongoose.connection.name;
-    const host = mongoose.connection.host;
-
-    console.log(`✅ MongoDB connected`);
-    console.log(`📦 Database: ${dbName}`);
-    console.log(`🌐 Host: ${host}`);
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server listening on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error('❌ Startup failure:', err.message);
-    process.exit(1);
-  }
+if (!MONGO_URI) {
+    console.error('LỖI NGHIÊM TRỌNG: Chưa khai báo MONGO_URI trong file .env');
+    process.exit(1); // Dừng server ngay lập tức nếu không có kết nối DB
 }
 
-start();
+// Kết nối Mongoose
+mongoose.connect(MONGO_URI)
+    .then((conn) => {
+        console.log(`Kết nối MongoDB thành công!`);
+        console.log(`Host: ${conn.connection.host}`);
+        // ĐÁP ỨNG YÊU CẦU CỦA BẠN: In ra tên của Database đang dùng
+        console.log(`Database: [ ${conn.connection.name} ]`);
+
+        // Chỉ khi DB kết nối thành công thì mới mở port cho user truy cập
+        app.listen(PORT, () => {
+            console.log(`Server đang lắng nghe tại http://localhost:${PORT}`);
+            console.log(`=======================================================`);
+        });
+    })
+    .catch((err) => {
+        console.error(`Lỗi kết nối MongoDB: ${err.message}`);
+        process.exit(1);
+    });
