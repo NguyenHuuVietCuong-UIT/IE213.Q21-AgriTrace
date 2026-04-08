@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // Khai báo Schema cho từng đối tượng bên trong mảng logs
 const logSchema = new mongoose.Schema({
     action: { type: String, required: true },
-    actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     location: { type: String, required: true },
     timestamp: { type: Date, required: true, default: Date.now },
     imageUrl: { type: String, default: "" } // TRƯỜNG HÌNH ẢNH MỚI ĐƯỢC THÊM VÀO

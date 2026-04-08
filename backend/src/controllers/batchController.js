@@ -206,9 +206,9 @@ const batchController = {
             const newIpfsHash = pinResult.IpfsHash;
 
             // 4. Gọi Smart Contract bằng ethers.js
-            const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+            const provider = new ethers.JsonRpcProvider(process.env.ETH_RPC_URL);
             const wallet = new ethers.Wallet(process.env.SYSTEM_PRIVATE_KEY, provider);
-            const contract = new ethers.Contract(process.env.SMART_CONTRACT_ADDRESS, MINIMAL_ABI, wallet);
+            const contract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, MINIMAL_ABI, wallet);
 
             const tx = await contract.updateShipping(updatedBatch.tokenId, newIpfsHash);
             await tx.wait(); // Đợi giao dịch hoàn tất trên mạng lưới

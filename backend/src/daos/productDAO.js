@@ -18,7 +18,7 @@ const productDao = {
             if (mongoose.Types.ObjectId.isValid(keyword)) {
                 query._id = keyword; // Tìm chính xác theo ID
             } else {
-                query.name = { $regex: keyword, $options: 'i' }; // 'i' là case-insensitive
+                query.productName = { $regex: keyword, $options: 'i' }; // 'i' là case-insensitive
             }
         }
 

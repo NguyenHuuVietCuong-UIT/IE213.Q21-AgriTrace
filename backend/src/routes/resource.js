@@ -14,7 +14,9 @@ router.post('/products', verifyToken, requireRole('FARMER'), resourceController.
 // CÁC ROUTE TÌM KIẾM DÙNG CHUNG (READ)
 // ==========================================
 // Có thể mở cho tất cả User đăng nhập, hoặc thậm chí Public tùy logic nghiệp vụ của bạn
+router.get('/farms/mine', verifyToken, requireRole('FARMER'), resourceController.getMyFarm);
 router.get('/products/search', verifyToken, resourceController.searchProducts);
 router.get('/inspectors/search', verifyToken, resourceController.searchInspectors);
+router.get('/farms/my-farm', verifyToken, requireRole('FARMER'), resourceController.getMyFarm);
 
 module.exports = router;
