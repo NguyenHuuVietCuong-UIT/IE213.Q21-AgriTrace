@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'; // Thêm Link vào đây
 import { ethers } from 'ethers';
 import styles from './Login.module.css';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'http://localhost:5000/api/user';
 
 export default function Login() {
     const [role, setRole] = useState('FARMER');
@@ -31,7 +31,7 @@ export default function Login() {
 
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            navigate('/farmer/dashboard');
+            navigate('/');
 
         } catch (err) {
             setError(err.message);
@@ -77,7 +77,7 @@ export default function Login() {
 
             localStorage.setItem('token', verifyData.token);
             localStorage.setItem('user', JSON.stringify(verifyData.user));
-            navigate('/inspector');
+            navigate('/');
 
         } catch (err) {
             console.error(err);

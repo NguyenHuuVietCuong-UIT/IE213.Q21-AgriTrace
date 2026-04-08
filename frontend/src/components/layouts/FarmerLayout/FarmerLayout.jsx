@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, Link } from 'react-router-dom';
 import { LuLeaf, LuLayoutDashboard, LuBook, LuUser, LuBell } from "react-icons/lu";
 import styles from './FarmerLayout.module.css';
 
@@ -33,15 +33,17 @@ const FarmerLayout = () => {
       <nav className={styles.topbar}>
 
         {/* Logo */}
-        <div className={styles.logoGroup}>
-          <div className={styles.logoIcon}>
-            <LuLeaf size={24} />
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className={styles.logoGroup}>
+            <div className={styles.logoIcon}>
+              <LuLeaf size={24} />
+            </div>
+            <div className={styles.logoText}>
+              <span className={styles.brand}>AgriTrace</span>
+              <span className={styles.portal}>Farmer Portal</span>
+            </div>
           </div>
-          <div className={styles.logoText}>
-            <span className={styles.brand}>AgriTrace</span>
-            <span className={styles.portal}>Farmer Portal</span>
-          </div>
-        </div>
+        </Link>
 
         {/* Menu Điều Hướng */}
         <div className={styles.navLinks}>

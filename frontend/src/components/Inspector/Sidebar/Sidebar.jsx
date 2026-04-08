@@ -1,18 +1,21 @@
 import React from 'react';
 import styles from './Sidebar.module.css';
+import { Link } from 'react-router-dom';
 import { AgriTraceIcon, MetaMaskIcon } from '../Icons/Icons';
 
 export const Sidebar = ({ account, onConnect, isConnecting }) => {
     return (
         <div className={styles.sidebar}>
             {/* Logo */}
-            <div className={styles.logo}>
-                <AgriTraceIcon />
-                <div>
-                    <div className={styles.logoTextMain}>AgriTrace</div>
-                    <div className={styles.logoTextSub}>Inspector Portal</div>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+                <div className={styles.logo}>
+                    <AgriTraceIcon />
+                    <div>
+                        <div className={styles.logoTextMain}>AgriTrace</div>
+                        <div className={styles.logoTextSub}>Inspector Portal</div>
+                    </div>
                 </div>
-            </div>
+            </Link>
 
             {/* Menu giữa */}
             <nav className={styles.menu}>

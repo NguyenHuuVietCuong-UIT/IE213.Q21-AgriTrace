@@ -1,237 +1,477 @@
-import React, { useState, useEffect } from 'react';
-import { LuBox, LuTrendingUp, LuPackageCheck, LuAward, LuPlus } from "react-icons/lu";
+import React, { useState, useEffect, useRef } from 'react';
+import { LuBox, LuTrendingUp, LuPackageCheck, LuAward, LuPlus, LuMapPin } from "react-icons/lu";
+import { Link } from 'react-router-dom';
 import BatchCard from '../../../components/Farmer/BatchCard/BatchCard';
 import styles from './FarmerDashboard.module.css';
 
-const API_URL = 'http://localhost:5000/api/batches';
+const API_BASE = 'http://localhost:5000/api';
 
 const FarmerDashboard = () => {
+  const searchRef = useRef(null);
   const [batches, setBatches] = useState([]);
+  const [myFarm, setMyFarm] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // State cho Modal thêm lô hàng
-  const [showModal, setShowModal] = useState(false);
-  const [newBatch, setNewBatch] = useState({
-    productId: '', // Lưu ý: Cần nhập ID của Product có thật trong DB
-    harvestDate: '',
-    quantity: ''
+  // --- QUẢN LÝ MODAL ---
+  const [modalState, setModalState] = useState({ type: null, isOpen: false, batchId: null, message: '' });
+
+  // States cho Form
+  const [newFarm, setNewFarm] = useState({ name: '', location: '', description: '' });
+  const [newBatch, setNewBatch] = useState({ productId: '', productName: '', harvestDate: '', quantity: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', description: '' });
+  const [inspectorData, setInspectorData] = useState({ inspectorId: '', inspectorName: '' });
+  const [newLog, setNewLog] = useState({ action: '', location: '' });
+
+  // States Tìm kiếm
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const searchTimeoutRef = useRef(null);
+
+  const getAuthHeader = () => ({
+    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'application/json'
   });
 
-  const fetchMyBatches = async () => {
+  const closeModal = () => {
+    setModalState({ type: null, isOpen: false, batchId: null, message: '' });
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const showMessage = (msg) => setModalState({ type: 'MESSAGE', isOpen: true, message: msg });
+
+  // --- TẢI DỮ LIỆU BAN ĐẦU ---
+  const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error("Bạn chưa đăng nhập!");
-
-      const response = await fetch(`${API_URL}/mine`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-          return;
-        }
-        throw new Error("Lỗi khi tải dữ liệu");
+      const farmRes = await fetch(`${API_BASE}/resources/farms/mine`, { headers: getAuthHeader() });
+      if (farmRes.ok) {
+        const farmJson = await farmRes.json();
+        setMyFarm(farmJson.data);
       }
 
-      const data = await response.json();
-      setBatches(data);
+      const batchRes = await fetch(`${API_BASE}/batches/mine`, { headers: getAuthHeader() });
+      if (batchRes.ok) {
+        const batchData = await batchRes.json();
+        setBatches(batchData);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Lỗi tải dữ liệu:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => { fetchData(); }, []);
   useEffect(() => {
-    fetchMyBatches();
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchResults([]);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 1. TÍNH NĂNG THÊM LÔ HÀNG
-  const handleCreateBatch = async (e) => {
+  // --- LOGIC TÌM KIẾM MỚI (TỐI ƯU UX) ---
+  const handleSearch = (type) => (e) => {
+    const q = (e?.target?.value || '').trim().toLowerCase();
+    setSearchQuery(q);
+
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const endpoint = type === 'product' ? 'products/search' : 'inspectors/search';
+
+        const res = await fetch(
+          `${API_BASE}/resources/${endpoint}?q=${encodeURIComponent(q)}`,
+          { headers: getAuthHeader() }
+        );
+
+        const json = await res.json();
+
+        if (json.success) {
+          const filtered = json.data.filter(item =>
+            (item.productName || item.name)
+              .toLowerCase()
+              .includes(q)
+          );
+
+          setSearchResults(filtered);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, 300);
+  };
+  // --- CÁC HÀM SUBMIT ---
+  const handleCreateFarm = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(API_URL, {
+      const res = await fetch(`${API_BASE}/resources/farms`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: getAuthHeader(),
+        body: JSON.stringify(newFarm)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      showMessage("Tạo nông trại thành công!");
+      fetchData();
+    } catch (err) { showMessage(err.message); }
+  };
+
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE}/resources/products`, {
+        method: 'POST',
+        headers: getAuthHeader(),
+        // Chú ý gửi đúng định dạng field
+        body: JSON.stringify({
+          name: newProduct.name,
+          description: newProduct.description,
+          farmId: myFarm._id
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Lỗi tạo sản phẩm");
+
+      // Tự động gán sản phẩm vừa tạo vào form Lô hàng
+      setNewBatch({ ...newBatch, productId: data.data._id, productName: data.data.productName });
+      setNewProduct({ name: '', description: '' }); // Reset form
+      setSearchQuery('');
+      setSearchResults([]);
+      setModalState({ type: 'CREATE_BATCH', isOpen: true });
+    } catch (err) { showMessage(err.message); }
+  };
+
+  const handleCreateBatch = async (e) => {
+    e.preventDefault();
+    if (!newBatch.productId) return showMessage("Vui lòng chọn sản phẩm!");
+    try {
+      const res = await fetch(`${API_BASE}/batches`, {
+        method: 'POST',
+        headers: getAuthHeader(),
         body: JSON.stringify(newBatch)
       });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Lỗi tạo lô hàng");
-      }
-
-      alert("Tạo lô hàng mới thành công!");
-      setShowModal(false); // Đóng modal
-      setNewBatch({ productId: '', harvestDate: '', quantity: '' }); // Reset form
-      fetchMyBatches(); // Load lại danh sách
-    } catch (err) {
-      alert(err.message);
-    }
+      if (!res.ok) throw new Error("Lỗi tạo lô hàng");
+      showMessage("Tạo lô hàng thành công!");
+      fetchData();
+    } catch (err) { showMessage(err.message); }
   };
 
-  // 2. TÍNH NĂNG GỬI YÊU CẦU KIỂM ĐỊNH (KHÓA LÔ HÀNG)
-  const handleComplete = async (id) => {
-    // Yêu cầu Nông dân nhập ID của người kiểm định (Trong thực tế nên làm 1 dropdown list để chọn)
-    const inspectorId = window.prompt("Nhập ID của người kiểm định (Inspector ID) cho lô hàng này:");
-
-    if (!inspectorId) {
-      alert("Bạn phải nhập hoặc cung cấp ID của người kiểm định để tiếp tục!");
-      return;
-    }
-
-    if (window.confirm("Xác nhận hoàn tất canh tác và gửi yêu cầu kiểm định? (Bạn sẽ không thể thêm nhật ký nữa)")) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/${id}/lock`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json', // Cần thêm header này để gửi JSON
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ inspectorId }) // Gửi inspectorId lên Backend
-        });
-
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.message || "Lỗi khi gửi yêu cầu");
-        }
-
-        alert("Đã gửi yêu cầu kiểm định thành công!");
-        fetchMyBatches(); // Load lại data
-      } catch (err) {
-        alert(err.message);
-      }
-    }
+  const handleLockBatch = async (e) => {
+    e.preventDefault();
+    if (!inspectorData.inspectorId) return showMessage("Vui lòng chọn người kiểm định!");
+    try {
+      const res = await fetch(`${API_BASE}/batches/${modalState.batchId}/lock`, {
+        method: 'PUT',
+        headers: getAuthHeader(),
+        body: JSON.stringify({ inspectorId: inspectorData.inspectorId })
+      });
+      if (!res.ok) throw new Error("Lỗi gửi yêu cầu");
+      showMessage("Gửi yêu cầu kiểm định thành công!");
+      fetchData();
+    } catch (err) { showMessage(err.message); }
   };
 
-  // TÍNH NĂNG THÊM NHẬT KÝ
-  const handleAddActivity = async (id) => {
-    const action = prompt("Nhập hoạt động canh tác (VD: Bón phân, Tưới nước):");
-    const location = prompt("Nhập địa điểm thực hiện (VD: Khu A, Nhà kính 1):");
-
-    if (action && location) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/${id}/logs`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ action, location })
-        });
-
-        if (!response.ok) throw new Error("Lỗi khi thêm nhật ký");
-        fetchMyBatches();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
+  const handleAddLog = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE}/batches/${modalState.batchId}/logs`, {
+        method: 'POST',
+        headers: getAuthHeader(),
+        body: JSON.stringify(newLog)
+      });
+      if (!res.ok) throw new Error("Lỗi thêm nhật ký");
+      showMessage("Thêm nhật ký thành công!");
+      fetchData();
+    } catch (err) { showMessage(err.message); }
   };
 
-  const totalBatches = batches.length;
-  const farmingCount = batches.filter(b => b.status === 'PENDING').length;
-  const pendingCount = batches.filter(b => b.status === 'LOCKED').length;
-  const mintedCount = batches.filter(b => b.status === 'MINTED').length;
-
-  if (loading) return <div>Đang tải dữ liệu trang trại...</div>;
+  if (loading) return <div className={styles.loading}>Đang tải dữ liệu trang trại...</div>;
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <div>
-            <h1>Tổng quan trang trại</h1>
-            <p>Quản lý các lô hàng và hoạt động canh tác</p>
+            <Link to="/" style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}>
+              <h1>Tổng quan trang trại</h1>
+            </Link>
+            {myFarm ? (
+              <p className={styles.farmInfo}>
+                <LuMapPin size={16} /> {myFarm.farmName} — <span>{myFarm.location}</span>
+              </p>
+            ) : (
+              <p className={styles.noFarm}>Bạn chưa khởi tạo thông tin nông trại.</p>
+            )}
           </div>
-          {/* Nút Mở Modal Thêm Lô Hàng */}
-          <button className={styles.addBatchBtn} onClick={() => setShowModal(true)}>
-            <LuPlus /> Tạo lô hàng mới
-          </button>
+          <div className={styles.headerActions}>
+            {!myFarm && (
+              <button className={styles.addFarmBtn} onClick={() => setModalState({ type: 'CREATE_FARM', isOpen: true })}>
+                <LuPlus /> Thiết lập Nông trại
+              </button>
+            )}
+            <button
+              className={styles.addBatchBtn}
+              onClick={() => {
+                if (!myFarm) return showMessage("Hãy thiết lập Nông trại trước!");
+                setNewBatch({ productId: '', productName: '', harvestDate: '', quantity: '' }); // Clear data cũ
+                setModalState({ type: 'CREATE_BATCH', isOpen: true });
+              }}
+            >
+              <LuPlus /> Tạo lô hàng mới
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* MODAL THÊM LÔ HÀNG */}
-      {showModal && (
+      {/* --- CÁC MODAL --- */}
+      {modalState.isOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <h2>Tạo Lô Hàng Mới</h2>
-            <form onSubmit={handleCreateBatch}>
-              <div className={styles.formGroup}>
-                <label>ID Sản phẩm (Product Object ID)</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nhập ID sản phẩm từ DB..."
-                  value={newBatch.productId}
-                  onChange={e => setNewBatch({ ...newBatch, productId: e.target.value })}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Ngày thu hoạch dự kiến</label>
-                <input
-                  type="date"
-                  required
-                  value={newBatch.harvestDate}
-                  onChange={e => setNewBatch({ ...newBatch, harvestDate: e.target.value })}
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Sản lượng dự kiến (kg)</label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  placeholder="VD: 500"
-                  value={newBatch.quantity}
-                  onChange={e => setNewBatch({ ...newBatch, quantity: e.target.value })}
-                />
-              </div>
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Hủy</button>
-                <button type="submit" className={styles.submitBtn}>Tạo lô hàng</button>
-              </div>
-            </form>
+
+            {/* Modal Thông báo */}
+            {modalState.type === 'MESSAGE' && (
+              <>
+                <h2>Thông báo</h2>
+                <p className={styles.modalMsg}>{modalState.message}</p>
+                <div className={styles.modalActions}>
+                  <button className={styles.submitBtn} onClick={closeModal}>Đóng</button>
+                </div>
+              </>
+            )}
+
+            {/* Modal Thiết lập Nông trại */}
+            {modalState.type === 'CREATE_FARM' && (
+              <>
+                <h2>Thiết lập Nông trại</h2>
+                <form onSubmit={handleCreateFarm}>
+                  <div className={styles.formGroup}>
+                    <label>Tên Nông trại</label>
+                    <input type="text" required value={newFarm.name} onChange={e => setNewFarm({ ...newFarm, name: e.target.value })} placeholder="VD: Nông trại xanh" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Địa chỉ</label>
+                    <input type="text" required value={newFarm.location} onChange={e => setNewFarm({ ...newFarm, location: e.target.value })} placeholder="VD: Đà Lạt, Lâm Đồng" />
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button type="button" className={styles.cancelBtn} onClick={closeModal}>Hủy</button>
+                    <button type="submit" className={styles.submitBtn}>Lưu thông tin</button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Modal Tạo Lô Hàng */}
+            {modalState.type === 'CREATE_BATCH' && (
+              <>
+                <h2>Tạo Lô Hàng Mới</h2>
+                <form onSubmit={handleCreateBatch}>
+                  <div className={styles.formGroup}>
+                    <label>Sản phẩm (Nhấn để chọn)</label>
+
+                    {/* KHU VỰC CHỌN SẢN PHẨM THÔNG MINH */}
+                    {!newBatch.productId ? (
+                      <div className={styles.searchWrapper} ref={searchRef}>
+                        <input
+                          type="text"
+                          placeholder="Nhấn vào đây để xem danh sách hoặc gõ tìm..."
+                          value={searchQuery}
+                          onChange={handleSearch('product')}
+                          onFocus={() => handleSearch('product')({ target: { value: searchQuery } })}
+                        />
+                        {searchQuery && (
+                          <div className={styles.searchDropdown}>
+                            {searchResults.length > 0 ? (
+                              searchResults.map(p => (
+                                <div
+                                  key={p._id}
+                                  className={styles.searchItem}
+                                  onClick={() => {
+                                    setNewBatch({
+                                      ...newBatch,
+                                      productId: p._id,
+                                      productName: p.productName
+                                    });
+                                    setSearchQuery('');
+                                    setSearchResults([]);
+                                  }}
+                                >
+                                  {p.productName}
+                                </div>
+                              ))
+                            ) : (
+                              <div className={styles.noResult}>
+                                Không tìm thấy sản phẩm
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
+                        <strong style={{ color: '#047857' }}>{newBatch.productName}</strong>
+                        <button type="button" onClick={() => setNewBatch({ ...newBatch, productId: '', productName: '' })} style={{ border: 'none', background: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer' }}>Đổi sản phẩm</button>
+                      </div>
+                    )}
+
+                    {/* NÚT TẠO SẢN PHẨM MỚI */}
+                    <button type="button" className={styles.inlineAction} style={{ marginTop: '10px' }} onClick={() => {
+                      setSearchQuery(''); setSearchResults([]); // Dọn dẹp tìm kiếm
+                      setModalState({ type: 'CREATE_PRODUCT', isOpen: true });
+                    }}>
+                      + Hoặc tạo sản phẩm mới
+                    </button>
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Ngày thu hoạch dự kiến</label>
+                    <input type="date" required value={newBatch.harvestDate} onChange={e => setNewBatch({ ...newBatch, harvestDate: e.target.value })} />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Sản lượng dự kiến (kg)</label>
+                    <input type="number" required min="1" value={newBatch.quantity} onChange={e => setNewBatch({ ...newBatch, quantity: e.target.value })} />
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button type="button" className={styles.cancelBtn} onClick={closeModal}>Hủy</button>
+                    <button type="submit" className={styles.submitBtn} disabled={!newBatch.productId}>Tạo lô hàng</button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Modal Tạo Sản Phẩm Mới */}
+            {modalState.type === 'CREATE_PRODUCT' && (
+              <>
+                <h2>Thêm Sản Phẩm Mới</h2>
+                <form onSubmit={handleCreateProduct}>
+                  <div className={styles.formGroup}>
+                    <label>Tên Sản phẩm</label>
+                    <input type="text" required value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} placeholder="VD: Cà chua Cherry" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Mô tả ngắn</label>
+                    <input type="text" required value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} placeholder="Đặc tính, loại hạt giống..." />
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button type="button" className={styles.cancelBtn} onClick={() => setModalState({ type: 'CREATE_BATCH', isOpen: true })}>Quay lại</button>
+                    <button type="submit" className={styles.submitBtn}>Lưu Sản phẩm</button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Modal Khóa/Gửi yêu cầu */}
+            {modalState.type === 'LOCK_BATCH' && (
+              <>
+                <h2>Yêu cầu kiểm định</h2>
+                <form onSubmit={handleLockBatch}>
+                  <div className={styles.formGroup}>
+                    <label>Người kiểm định (Nhấn để chọn)</label>
+
+                    {/* KHU VỰC CHỌN INSPECTOR THÔNG MINH */}
+                    {!inspectorData.inspectorId ? (
+                      <div className={styles.searchWrapper} ref={searchRef}>
+                        <input
+                          type="text"
+                          placeholder="Nhấn vào đây để xem danh sách hoặc gõ tìm..."
+                          value={searchQuery}
+                          onChange={handleSearch('inspector')}
+                          onFocus={handleSearch('inspector')}
+                        />
+                        {searchQuery && (
+                          <div className={styles.searchDropdown}>
+                            {searchResults.length > 0 ? (
+                              searchResults.map(i => (
+                                <div key={i._id} className={styles.searchItem} onClick={() => {
+                                  setInspectorData({ inspectorId: i._id, inspectorName: i.name });
+                                  setSearchQuery('');
+                                  setSearchResults([]);
+                                }}>
+                                  <strong>{i.name}</strong>
+                                  <small style={{ color: '#6b7280' }}>
+                                    ({i.walletAddress?.slice(0, 8)}...)
+                                  </small>
+                                </div>
+                              ))
+                            ) : (
+                              <div className={styles.noResult}>
+                                Không tìm thấy kiểm định viên
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', background: '#ecfdf5', border: '1px solid #10b981', borderRadius: '6px' }}>
+                        <strong style={{ color: '#047857' }}>{inspectorData.inspectorName}</strong>
+                        <button type="button" onClick={() => setInspectorData({ inspectorId: '', inspectorName: '' })} style={{ border: 'none', background: 'none', color: '#ef4444', fontWeight: 'bold', cursor: 'pointer' }}>Đổi người</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button type="button" className={styles.cancelBtn} onClick={closeModal}>Hủy</button>
+                    <button type="submit" className={styles.submitBtn} disabled={!inspectorData.inspectorId}>Gửi yêu cầu</button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {/* Modal Thêm Nhật Ký */}
+            {modalState.type === 'ADD_LOG' && (
+              <>
+                <h2>Thêm Nhật Ký Canh Tác</h2>
+                <form onSubmit={handleAddLog}>
+                  <div className={styles.formGroup}>
+                    <label>Hoạt động</label>
+                    <input type="text" required value={newLog.action} onChange={e => setNewLog({ ...newLog, action: e.target.value })} placeholder="VD: Bón phân hữu cơ" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Địa điểm</label>
+                    <input type="text" required value={newLog.location} onChange={e => setNewLog({ ...newLog, location: e.target.value })} placeholder="VD: Nhà kính A1" />
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button type="button" className={styles.cancelBtn} onClick={closeModal}>Hủy</button>
+                    <button type="submit" className={styles.submitBtn}>Lưu nhật ký</button>
+                  </div>
+                </form>
+              </>
+            )}
+
           </div>
         </div>
       )}
 
-      {/* KHU VỰC THỐNG KÊ */}
+      {/* THỐNG KÊ (GIỮ NGUYÊN) */}
       <div className={styles.statsGrid}>
-        {/* ... (Giữ nguyên 4 thẻ thống kê của bạn ở đây) ... */}
         <div className={styles.statCard}>
-          <div className={styles.statInfo}><span>Tổng số lô</span><div className={styles.statNumber}>{totalBatches}</div></div>
+          <div className={styles.statInfo}><span>Tổng số lô</span><div className={styles.statNumber}>{batches.length}</div></div>
           <div className={`${styles.statIcon} ${styles.iconTotal}`}><LuBox /></div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statInfo}><span>Đang canh tác</span><div className={styles.statNumber} style={{ color: '#10b981' }}>{farmingCount}</div></div>
+          <div className={styles.statInfo}><span>Đang canh tác</span><div className={styles.statNumber} style={{ color: '#10b981' }}>{batches.filter(b => b.status === 'PENDING').length}</div></div>
           <div className={`${styles.statIcon} ${styles.iconFarming}`}><LuTrendingUp /></div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statInfo}><span>Chờ kiểm định</span><div className={styles.statNumber} style={{ color: '#f59e0b' }}>{pendingCount}</div></div>
+          <div className={styles.statInfo}><span>Chờ kiểm định</span><div className={styles.statNumber} style={{ color: '#f59e0b' }}>{batches.filter(b => b.status === 'LOCKED').length}</div></div>
           <div className={`${styles.statIcon} ${styles.iconPending}`}><LuPackageCheck /></div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statInfo}><span>Đã đúc NFT</span><div className={styles.statNumber} style={{ color: '#3b82f6' }}>{mintedCount}</div></div>
+          <div className={styles.statInfo}><span>Đã đúc NFT</span><div className={styles.statNumber} style={{ color: '#3b82f6' }}>{batches.filter(b => b.status === 'MINTED').length}</div></div>
           <div className={`${styles.statIcon} ${styles.iconMinted}`}><LuAward /></div>
         </div>
       </div>
 
-      {/* LƯỚI DANH SÁCH LÔ HÀNG */}
       <div className={styles.batchGrid}>
         {batches.map(batch => (
           <BatchCard
             key={batch._id}
             batch={batch}
-            onComplete={() => handleComplete(batch._id)}
-            onAddActivity={() => handleAddActivity(batch._id)}
+            onComplete={() => setModalState({ type: 'LOCK_BATCH', isOpen: true, batchId: batch._id })}
+            onAddActivity={() => setModalState({ type: 'ADD_LOG', isOpen: true, batchId: batch._id })}
           />
         ))}
       </div>
