@@ -1,28 +1,119 @@
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1.1rem;
+  color: #64748b;
+}
+
+
 .container {
-  padding: 2rem 5%;
-  background-color: #f8fafc; /* Nền xám nhạt để nổi bật các Card trắng */
+  /* max(16px, 5%) đảm bảo padding tối thiểu 16px trên mọi màn hình */
+  padding: 2rem max(16px, 5%);
+  background-color: #f8fafc;
   min-height: 100vh;
 }
+
+/* HEADER */
 
 .header {
   margin-bottom: 2.5rem;
 }
 
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 .header h1 {
   font-size: 2rem;
   color: #1e293b;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.2;
 }
 
-.header p {
+/* Thông tin nông trại dưới tiêu đề */
+.farmInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.farmInfo span {
   color: #64748b;
-  font-size: 1.1rem;
 }
 
-/* --- Khu vực 4 thẻ thống kê --- */
+/* Khi chưa có nông trại */
+.noFarm {
+  color: #059669;
+  font-size: 0.95rem;
+  margin: 4px 0 0 0;
+}
+
+/* Khu vực chứa các nút hành động */
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* Nút Thiết lập nông trại */
+.addFarmBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #059669;
+  color: white;
+  border: none;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.addFarmBtn:hover {
+  background-color: #047857;
+}
+
+/* Nút Tạo lô hàng mới */
+.addBatchBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 0.65rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.addBatchBtn:hover {
+  background-color: #059669;
+}
+
+/* STATS GRID */
+
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* Mặc định trên Desktop là 4 cột bằng nhau */
+  grid-template-columns: repeat(4, 1fr); 
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
@@ -38,17 +129,23 @@
   border: 1px solid #f1f5f9;
 }
 
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
 .statInfo span {
   display: block;
   color: #64748b;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
 }
 
 .statNumber {
   font-size: 2rem;
   font-weight: 800;
   color: #1e293b;
+  line-height: 1;
 }
 
 .statIcon {
@@ -58,59 +155,24 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  flex-shrink: 0;
 }
 
-/* Màu sắc riêng cho từng Icon Stat */
-.iconTotal { background: #f1f5f9; color: #64748b; }
+.iconTotal   { background: #f1f5f9; color: #64748b; }
 .iconFarming { background: #ecfdf5; color: #10b981; }
 .iconPending { background: #fff7ed; color: #f59e0b; }
-.iconMinted { background: #eff6ff; color: #3b82f6; }
+.iconMinted  { background: #eff6ff; color: #3b82f6; }
 
-/* --- Lưới danh sách lô hàng --- */
+
 .batchGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
-@media (max-width: 1024px) {
-  .batchGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* MODAL */
 
-@media (max-width: 640px) {
-  .batchGrid {
-    grid-template-columns: 1fr;
-  }
-}
-/* --- NÚT THÊM LÔ HÀNG --- */
-.headerTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.addBatchBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.addBatchBtn:hover {
-  background-color: #059669;
-}
-
-/* --- MODAL (HỘP THOẠI THÊM LÔ HÀNG) --- */
 .modalOverlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -119,22 +181,81 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  /* padding để modal không dính sát mép màn hình trên mobile */
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modalContent {
   background: white;
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 16px;
   width: 100%;
-  max-width: 450px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-width: 460px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  /* tránh tràn chiều cao trên màn hình nhỏ */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .modalContent h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
   color: #1f2937;
 }
+
+/* Nội dung text trong modal thông báo */
+.modalMsg {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.cancelBtn {
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  transition: background-color 0.2s;
+}
+
+.cancelBtn:hover {
+  background-color: #e5e7eb;
+}
+
+.submitBtn {
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background-color: #10b981;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.submitBtn:hover {
+  background-color: #059669;
+}
+
+.submitBtn:disabled {
+  background-color: #a7f3d0;
+  cursor: not-allowed;
+}
+
+/* FORM */
 
 .formGroup {
   margin-bottom: 1.25rem;
@@ -155,66 +276,17 @@
   border-radius: 6px;
   outline: none;
   box-sizing: border-box;
+  font-size: 1rem;
+  color: #1f2937;
+  transition: border-color 0.2s;
 }
 
 .formGroup input:focus {
   border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-.modalActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.cancelBtn, .submitBtn {
-  padding: 0.7rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-}
-
-.cancelBtn {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-.cancelBtn:hover { background-color: #e5e7eb; }
-
-.submitBtn {
-  background-color: #10b981;
-  color: white;
-}
-.submitBtn:hover { background-color: #059669; }
-
-/* --- Khu vực Nút bấm trên Header --- */
-.headerActions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* Style cho nút Thiết lập Nông trại */
-.addFarmBtn {
-  background-color: #059669; /* Màu vàng cam */
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: background-color 0.2s ease;
-}
-
-.addFarmBtn:hover {
-  background-color: #059669; /* Đậm hơn khi di chuột vào */
-}
-
+/* SEARCH */
 
 .searchWrapper {
   position: relative;
@@ -227,14 +299,15 @@
   border-radius: 8px;
   outline: none;
   box-sizing: border-box;
-  transition: border 0.2s;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
 .searchWrapper input:focus {
   border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-/* Dropdown */
 .searchDropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -242,20 +315,22 @@
   width: 100%;
   max-height: 220px;
   overflow-y: auto;
-
   background: #ffffff;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  z-index: 100;
+  z-index: 200;
 }
 
-/* Item */
 .searchItem {
   padding: 10px 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  font-size: 0.95rem;
+  color: #374151;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .searchItem:hover {
@@ -263,30 +338,143 @@
   color: #047857;
 }
 
-/* Không có kết quả */
 .noResult {
   padding: 10px 14px;
   color: #9ca3af;
+  font-size: 0.9rem;
   font-style: italic;
 }
 
-/* --- NÚT + TẠO SẢN PHẨM --- */
+/* Nút Tạo sản phẩm mới */
 .inlineAction {
+  display: block;
+  width: 100%;
   margin-top: 10px;
-  padding: 8px 12px;
-
+  padding: 9px 12px;
   border-radius: 8px;
   border: 1px dashed #10b981;
-
   background-color: #ecfdf5;
   color: #047857;
-
   font-weight: 500;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  text-align: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .inlineAction:hover {
   background-color: #d1fae5;
   border-color: #059669;
+}
+
+/* RESPONSIVE — TABLE */
+
+@media (max-width: 1024px) {
+  .batchGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Ép lưới Thống kê thành 2 cột (2 trên, 2 dưới) */
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .headerTop {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .headerActions {
+    width: 100%;
+  }
+
+  .addBatchBtn,
+  .addFarmBtn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .statsGrid {
+    gap: 1rem;
+  }
+}
+
+/* RESPONSIVE — MOBILE */
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1.25rem max(16px, 4%);
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.7rem;
+  }
+
+  /* Ép 2 cột cố định cho stats — tránh bị 1 cột */
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .statCard {
+    padding: 1rem 0.85rem;
+  }
+
+  .statNumber {
+    font-size: 1.6rem;
+  }
+
+  .statIcon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  .batchGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .addBatchBtn,
+  .addFarmBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  /* Modal mobile */
+  .modalContent {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+    gap: 10px;
+    margin-top: 1.5rem;
+  }
+
+  .submitBtn,
+  .cancelBtn {
+    width: 100%;
+    padding: 12px;
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  /* ngăn iOS Safari auto-zoom khi tap vào input */
+  .formGroup input,
+  .searchWrapper input {
+    padding: 12px;
+    font-size: 16px;
+  }
 }

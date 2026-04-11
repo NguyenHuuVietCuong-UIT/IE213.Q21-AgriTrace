@@ -6,7 +6,6 @@
   --nav-linkhov-green: #10B981;
   --nav-shadow: rgba(0, 0, 0, 0.05);
   
-  /* Các biến bổ sung riêng cho Farmer */
   --nav-active-bg: rgba(16, 185, 129, 0.1);
   --nav-hover-bg: rgba(16, 185, 129, 0.05);
   --nav-avatar-bg: rgba(16, 185, 129, 0.15);
@@ -15,29 +14,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 5rem; 
+  padding: 1rem 5rem; 
   background-color: var(--nav-bg-white);
   position: sticky;
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 10px var(--nav-shadow);
-  transition: padding 0.3s ease;
-  height: 75px; 
+  height: 70px; 
 }
 
-/* Logo */
+/* LOGO */
+.logoLink {
+  flex: 1; /* Ép thẻ Link chiếm không gian để cân bằng với khối User bên phải */
+  display: flex;
+  text-decoration: none;
+  color: inherit;
+}
+
 .logoGroup {
-  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: 0.75rem;
 }
 
 .logoIcon {
   background-color: var(--nav-icon-green);
-  width: 35px;
-  height: 35px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -63,7 +66,7 @@
   font-weight: 500;
 }
 
-/* Menu */
+/* MENU ĐIỀU HƯỚNG */
 .navLinks {
   display: flex;
   align-items: center;
@@ -76,12 +79,16 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   text-decoration: none;
   color: var(--nav-link-slate);
   font-weight: 500;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.navItem svg {
+  font-size: 1.2rem; /* Đồng bộ kích thước Icon */
 }
 
 .navItem:hover {
@@ -89,19 +96,19 @@
   background-color: var(--nav-hover-bg);
 }
 
-/* Trạng thái Active (Trang hiện tại) */
 .active {
   color: var(--nav-icon-green);
   font-weight: 600;
+  background-color: var(--nav-active-bg); /* Thêm nền nhẹ cho nút đang chọn */
 }
 
-/* User */
+/* KHU VỰC USER */
 .userSection {
   flex: 1;
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .notification {
@@ -119,7 +126,7 @@
 
 .badge {
   position: absolute;
-  top: -5px;
+  top: -6px;
   right: -8px;
   background-color: var(--nav-badge-red);
   color: white;
@@ -151,14 +158,14 @@
 .avatar {
   background-color: var(--nav-avatar-bg);
   color: var(--nav-icon-green);
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .userDetails {
@@ -177,42 +184,93 @@
   color: var(--nav-link-slate);
 }
 
-/* Responsive */
-
+/* RESPONSIVE TABLET */
 @media (max-width: 1024px) {
   .topbar {
-    padding: 1rem 2rem;
-  }
-  .navLinks {
-    gap: 0.5rem;
-  }
-  .userSection {
-    gap: 1.5rem;
-  }
-}
+    padding: 1rem 1.5rem; /* Ép lề 2 bên nhỏ lại để nhường chỗ cho giữa */
+  } 
 
-@media (max-width: 768px) {
-  .topbar {
-    padding: 1rem 1.5rem;
-  }
-
-  .portal, 
-  .userDetails, 
-  .navItem span {
+  .portal {
     display: none; 
   }
 
+  .navLinks {
+    gap: 0.3rem; /* Kéo các nút sát lại nhau hơn */
+  }
+  
   .navItem {
-    padding: 0.5rem; 
+    padding: 0.5rem 0.6rem; 
+    font-size: 0.9rem; /* Thu nhỏ chữ */
   }
 
+  /* thông tin User phụ */
   .userSection {
     gap: 1rem;
   }
   
+  .userDetails {
+    display: none; /* ẩn tên */
+  }
+}
+
+/* RESPONSIVE MOBILE
+   Thiết kế Bottom Tab App-like */
+
+/* Đổi từ 768px thành 850px để kích hoạt Bottom Tab sớm hơn */
+@media (max-width: 850px) {
+  .topbar {
+    padding: 0.8rem 1.2rem;
+    height: 65px;
+  }
+
+  .userDetails {
+    display: none; /* Chỉ hiện Avatar, ẩn Tên và Role */
+  }
+
+  .userSection {
+    gap: 1.2rem;
+  }
+
   .avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.8rem;
+    width: 35px;
+    height: 35px;
+    font-size: 0.85rem;
+  }
+
+  /* Đưa toàn bộ Menu xuống đáy màn hình */
+  .navLinks {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    background-color: var(--nav-bg-white);
+    box-shadow: 0 -2px 10px var(--nav-shadow);
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    gap: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem); /* Tương thích iPhone tai thỏ */
+  }
+
+  /* Biến các nút thành dạng Cột (Icon trên, Text dưới) */
+  .navItem {
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.4rem;
+    font-size: 0.7rem; /* Thu nhỏ chữ */
+    background: none;
+    border-radius: 0;
+  }
+
+  .navItem svg {
+    font-size: 1.4rem; /* Phóng to Icon */
+  }
+
+  .navItem:hover {
+    background-color: transparent; /* Bỏ nền hover trên Mobile */
+  }
+
+  .active {
+    background-color: transparent;
   }
 }
