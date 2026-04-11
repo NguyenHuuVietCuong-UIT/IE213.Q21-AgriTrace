@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import styles from './Register.module.css'; // Dùng chung CSS cũ của bạn
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'http://localhost:5000/api/user';
 
 export default function Register() {
     const [role, setRole] = useState('FARMER'); // Thêm state quản lý Role
