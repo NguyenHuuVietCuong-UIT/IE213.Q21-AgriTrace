@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { InspectorDashboard } from './pages/InspectorDashboard/InspectorDashboard';
 import MainLayout from './components/layouts/MainLayout/MainLayout';
-import Home from './pages/Customer/Home/Home';
+import Home from './pages/Customer/Home';
+import About from './pages/Customer/About';
+
 import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
 import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 import Register from './pages/Auth/Register/Register';
@@ -25,6 +27,7 @@ function App() {
         {/* Customer sử dụng MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
         </Route>
 
         {/* Farmer sử dụng FarmerLayout */}

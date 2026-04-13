@@ -204,29 +204,15 @@
 /* --- PHẦN Responsive --- */
 
 /* Cho Tablet */
+
 @media (max-width: 1024px) {
-  .heroContainer {
-    padding: 3rem 2rem;
-    gap: 2rem;
-  }
-
-  .heading {
-    font-size: 2.8rem; 
-  }
-
-  .badgeGroup {
-    gap: 0.75rem; /* Thu hẹp khoảng cách các badge */
-  }
-}
-
-/* Cho Mobile */
-@media (max-width: 768px) {
   .heroContainer {
     /* Chuyển từ hàng ngang sang hàng dọc */
     flex-direction: column; 
     padding: 2.5rem 1.5rem;
     text-align: center; /* Căn giữa */
     min-height: auto;
+    gap: 3rem; /* Khoảng cách giữa phần Text và phần Form */
   }
 
   .contentLeft {
@@ -251,8 +237,10 @@
   }
 
   .formRight {
-    flex-basis: 100%; /* Form chiếm hết chiều ngang màn hình */
+    flex-basis: auto; 
     width: 100%;
+    max-width: 500px; /* Khống chế không cho form quá to trên tablet dọc */
+    margin: 0 auto; /* Căn giữa form */
   }
 
   .formCard {
@@ -263,4 +251,18 @@
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }   
+}
+
+/* Cho Mobile */
+
+@media (max-width: 768px) {
+  .heading {
+    font-size: 2.2rem;
+  }
+  .badgeGroup {
+    display: none;
+  }
+  .formCard {
+    padding: 2rem 1.5rem; 
+  }
 }

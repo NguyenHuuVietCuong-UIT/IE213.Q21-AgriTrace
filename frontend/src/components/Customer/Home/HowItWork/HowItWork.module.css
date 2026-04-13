@@ -1,6 +1,8 @@
 .section {
   padding: 3rem;
   background-color: #ffffff;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .header {
@@ -56,6 +58,12 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .iconWrapper {
   font-size: 2.5rem;
   margin-bottom: 1rem;
@@ -78,8 +86,8 @@
   position: absolute;
   top: 20px;
   /* Căn giữa theo vòng tròn số */
-  left: 60%;
-  right: -40%;
+  left: 65%;
+  right: -35%;
   height: 2px;
   background: repeating-linear-gradient(to right, #e2e8f0, #e2e8f0 5px, transparent 5px, transparent 10px);
   z-index: -1;
@@ -87,33 +95,76 @@
 
 /* --- RESPONSIVE --- */
 
+@media (max-width: 1024px) {
+  .section {
+    padding: 4rem 2rem;
+  }
+  .connector {
+    left: 70%;
+    right: -30%;
+  }
+}
+
+/* Cho Mpbile */
+
 @media (max-width: 768px) {
+  .section {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .header {
+    margin-bottom: 2.5rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.8rem;
+  }
+
   .stepsContainer {
     flex-direction: column;
-    gap: 3rem;
+    gap: 2rem;
   }
 
   .stepItem {
+    width: 100%;
     flex-direction: row;
-    /* Mobile */
     text-align: left;
-    gap: 1.5rem;
-    align-items: flex-start;
+    align-items: center; /* Căn giữa vòng tròn với toàn bộ khối text */
+    gap: 1.25rem;
   }
 
   .numberCircle {
     flex-shrink: 0;
-    /* Không cho vòng tròn bị bóp méo */
     margin-bottom: 0;
+    align-self: center; /* Vòng tròn tự căn giữa theo chiều cao của stepContent */
+  }
+
+  .stepContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+    justify-content: center; /* Căn nội dung vào giữa theo chiều dọc */
+    align-items: flex-start;
   }
 
   .iconWrapper {
     display: none;
-    /* Ẩn icon lớn để bớt rối trên mobile */
   }
 
   .connector {
     display: none;
-    /* Ẩn đường nối trên mobile */
+  }
+
+  .stepTitle {
+    font-size: 1.15rem;
+    margin-bottom: 0;
+  }
+
+  .stepDesc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-top: 0;
   }
 }
