@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './Navbar.module.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -43,9 +43,31 @@ const Navbar = () => {
 
       <div className={styles.navContent}>
         <ul className={styles.navLinks}>
-          <li><a href="#search" className={styles.link}>Tra cứu</a></li>
-          <li><a href="#how-it-works" className={styles.link}>Cách hoạt động</a></li>
-          <li><a href="#about" className={styles.link}>Về chúng tôi</a></li>
+          <li>
+            <NavLink
+              to="/"
+              end /* Bắt buộc phải có 'end' để không bị nhận nhầm với các trang con khác */
+              className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
+            >
+              Tra cứu
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/how-it-works"
+              className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
+            >
+              Cách hoạt động
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/about"
+              className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}
+            >
+              Về chúng tôi
+            </NavLink>
+          </li>
         </ul>
 
         {user ? (
