@@ -110,6 +110,16 @@ const batchController = {
     // LOGIC CHO NHÀ KIỂM ĐỊNH (INSPECTOR)
     // ==========================================
 
+    getAllInspectorBatches: async (req, res) => {
+        try {
+            // Lấy TẤT CẢ lô hàng được giao cho Inspector này (bất kể trạng thái là LOCKED, MINTED hay REJECTED)
+            const batches = await batchDao.findByInspector(req.user._id);
+            return res.json(batches);
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    },
+
     getPendingBatches: async (req, res) => {
         try {
             const batches = await batchDao.findPendingByInspector(req.user._id);

@@ -13,5 +13,6 @@ router.put('/:batchId/lock', verifyToken, requireRole('FARMER'), batchController
 router.get('/pending', verifyToken, requireRole('INSPECTOR'), batchController.getPendingBatches);
 router.post('/:batchId/pin', verifyToken, requireRole('INSPECTOR'), batchController.pinToIPFS);
 router.post('/:batchId/mint', verifyToken, requireRole('INSPECTOR'), batchController.confirmMint);
+router.get('/inspector-all', verifyToken, requireRole('INSPECTOR'), batchController.getAllInspectorBatches);
 
 module.exports = router;

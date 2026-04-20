@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './BatchCard.module.css';
 
-const BatchCard = ({ batch, onMint, isMinting }) => {
+const BatchCard = ({ batch, onMint, isMinting, isDisabled }) => {
     // Truy xuất dữ liệu an toàn từ Object ID hoặc Populate
     const productName = batch.productId?.name || "Sản phẩm nông sản";
     const farmerName = batch.farmId?.owner?.name || "Nông dân";
@@ -25,7 +25,7 @@ const BatchCard = ({ batch, onMint, isMinting }) => {
             <button
                 className={styles.mintBtn}
                 onClick={() => onMint(batch._id)}
-                disabled={isMinting}
+                disabled={isMinting || isDisabled}
             >
                 {isMinting ? '⏳ Đang đúc NFT...' : 'Phê duyệt & Đúc NFT'}
             </button>

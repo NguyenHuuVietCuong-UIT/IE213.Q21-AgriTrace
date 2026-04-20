@@ -3,10 +3,9 @@ import styles from './Sidebar.module.css';
 import { Link } from 'react-router-dom';
 import { AgriTraceIcon, MetaMaskIcon } from '../Icons/Icons';
 
-export const Sidebar = ({ account, onConnect, isConnecting }) => {
+export const Sidebar = ({ account, onConnect, isConnecting, currentTab, onTabChange }) => {
     return (
         <div className={styles.sidebar}>
-            {/* Logo */}
             <Link to="/" style={{ textDecoration: 'none' }}>
                 <div className={styles.logo}>
                     <AgriTraceIcon />
@@ -17,27 +16,39 @@ export const Sidebar = ({ account, onConnect, isConnecting }) => {
                 </div>
             </Link>
 
-            {/* Menu giữa */}
             <nav className={styles.menu}>
-                <a href="#" className={`${styles.menuItem} ${styles.active}`}>🏠 Tổng quan</a>
-                <a href="#" className={styles.menuItem}>📅 Lịch sử kiểm định</a>
-                <a href="#" className={styles.menuItem}>⚙️ Cài đặt ví</a>
+                <button
+                    onClick={() => onTabChange('overview')}
+                    className={`${styles.menuItem} ${currentTab === 'overview' ? styles.active : ''}`}
+                >
+                    🏠 Tổng quan
+                </button>
+                <button
+                    onClick={() => onTabChange('history')}
+                    className={`${styles.menuItem} ${currentTab === 'history' ? styles.active : ''}`}
+                >
+                    📅 Lịch sử
+                </button>
+                <button
+                    onClick={() => onTabChange('settings')}
+                    className={`${styles.menuItem} ${currentTab === 'settings' ? styles.active : ''}`}
+                >
+                    ⚙️ Cài đặt ví
+                </button>
             </nav>
 
-            {/* Ví MetaMask bên phải */}
             <div className={styles.connectedWallet}>
                 <div className={styles.walletHeader}>
                     <div className={styles.metaMaskContainer}><MetaMaskIcon /></div>
-                    <div>
-                        <div className={styles.walletTextMain}>Trạng thái ví</div>
+                    <div className={styles.walletTextGroup}>
+                        <div className={styles.walletLabel}>Ví Inspector</div>
                         {account ? (
-                            <div className={styles.walletTextSub}>
-                                {`${account.slice(0, 6)}...${account.slice(-4)}`}
-                                <span className={styles.network}>Sepolia</span>
+                            <div className={styles.address}>
+                                {`${account.slice(0, 4)}...${account.slice(-4)}`}
                             </div>
                         ) : (
-                            <button className={styles.connectBtn} onClick={onConnect} disabled={isConnecting}>
-                                {isConnecting ? 'Đang kết nối...' : 'Connect Wallet'}
+                            <button className={styles.miniConnect} onClick={onConnect}>
+                                {isConnecting ? '...' : 'Kết nối'}
                             </button>
                         )}
                     </div>

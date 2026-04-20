@@ -1,37 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { LuBox, LuCircleCheck, LuClock, LuTriangleAlert } from "react-icons/lu";
+import { LuBox, LuCircleCheck, LuClock, LuTriangleAlert, LuWallet, LuHistory, LuLayoutDashboard } from "react-icons/lu";
 import BatchCard from '../../components/Inspector/BatchCard/BatchCard';
 import { Sidebar } from '../../components/Inspector/Sidebar/Sidebar';
 import { useWeb3 } from '../../hooks/useWeb3';
-import styles from './InspectorDashboard.module.css'; // [GIỮ NGUYÊN]
+import styles from './InspectorDashboard.module.css';
 
 export const InspectorDashboard = () => {
     const [batches, setBatches] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // [TẠO MỚI] State quản lý Modal thông báo thay cho alert()
+    const [currentTab, setCurrentTab] = useState('overview');
     const [messageModal, setMessageModal] = useState({ isOpen: false, message: '', type: 'success' });
+    const [processingId, setProcessingId] = useState(null);
 
-    const { account, isConnecting, isMinting, connectWallet, handleMintNFT } = useWeb3();
-
+    const { account, networkName, balance, isConnecting, isMinting, connectWallet, disconnectWallet, handleMintNFT } = useWeb3();
     const getAuthToken = () => localStorage.getItem('token');
 
-    // [GIỮ NGUYÊN]
     const fetchBatchesFromDB = async () => {
         setLoading(true);
         try {
             const token = getAuthToken();
-            const response = await fetch('http://localhost:5000/api/batches/pending', {
+            // Lấy toàn bộ lô hàng liên quan đến inspector để phân loại vào các Tab
+            const response = await fetch('http://localhost:5000/api/batches/inspector-all', {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) throw new Error('Không thể tải dữ liệu');
             const result = await response.json();
-
-            if (Array.isArray(result)) setBatches(result);
-            else if (result.success && Array.isArray(result.data)) setBatches(result.data);
-            else setBatches([]);
+            setBatches(Array.isArray(result) ? result : (result.data || []));
         } catch (error) {
             console.error('Lỗi API:', error);
         } finally {
@@ -41,11 +37,10 @@ export const InspectorDashboard = () => {
 
     useEffect(() => { fetchBatchesFromDB(); }, []);
 
-    // [SỬA ĐỔI] Thay alert bằng Modal
     const handleApproveAndMint = async (batchId) => {
+        setProcessingId(batchId);
         try {
             const token = getAuthToken();
-
             const pinRes = await fetch(`http://localhost:5000/api/batches/${batchId}/pin`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -63,11 +58,13 @@ export const InspectorDashboard = () => {
             });
 
             if (confirmRes.ok) {
-                setMessageModal({ isOpen: true, message: '🎉 Đã cấp chứng nhận NFT thành công!', type: 'success' });
+                setMessageModal({ isOpen: true, message: 'Cấp chứng nhận NFT thành công!', type: 'success' });
                 fetchBatchesFromDB();
             }
         } catch (err) {
-            setMessageModal({ isOpen: true, message: `❌ Lỗi: ${err.message}`, type: 'error' });
+            setMessageModal({ isOpen: true, message: `Lỗi: ${err.message}`, type: 'error' });
+        } finally {
+            setProcessingId(null);
         }
     };
 
@@ -78,35 +75,114 @@ export const InspectorDashboard = () => {
         rejected: batches.filter(b => b.status === 'REJECTED').length
     };
 
+    const renderContent = () => {
+        if (loading) return <div className={styles.loadingArea}>Đang tải dữ liệu hệ thống...</div>;
+
+        switch (currentTab) {
+            case 'history':
+                const historyBatches = batches.filter(b => b.status === 'MINTED' || b.status === 'REJECTED');
+                return (
+                    <div className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <LuHistory /> <h2>Lịch sử kiểm định</h2>
+                        </div>
+                        {historyBatches.length === 0 ? (
+                            <p className={styles.emptyText}>Bạn chưa thực hiện kiểm định lô hàng nào.</p>
+                        ) : (
+                            <div className={styles.batchGrid}>
+                                {historyBatches.map(batch => (
+                                    <BatchCard key={batch._id} batch={batch} isDisabled={true} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+
+            case 'settings':
+                return (
+                    <div className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <LuWallet /> <h2>Cài đặt ví MetaMask</h2>
+                        </div>
+                        <div className={styles.settingsCard}>
+                            <div className={styles.walletInfoRow}>
+                                <span>Địa chỉ ví hiện tại:</span>
+                                <strong>
+                                    {account
+                                        ? `${account.slice(0, 6)}...${account.slice(-4)}`
+                                        : 'Chưa kết nối'}
+                                </strong>
+                            </div>
+                            <div className={styles.walletInfoRow}>
+                                <span>Số dư phí Gas:</span>
+                                <strong style={{ color: balance < 0.01 ? '#ef4444' : '#10b981' }}>
+                                    {account ? `${balance} ETH` : '0 ETH'}
+                                </strong>
+                            </div>
+                            <div className={styles.walletInfoRow}>
+                                <span>Mạng lưới:</span>
+                                <span className={styles.networkTag}>
+                                    {account ? (networkName || 'Đang tải...') : 'Chưa kết nối'}
+                                </span>
+                            </div>
+                            <button
+                                className={account ? styles.disconnectBtn : styles.connectBtn}
+                                onClick={account ? disconnectWallet : connectWallet}
+                            >
+                                {account ? 'Ngắt kết nối ví' : 'Kết nối ví'}
+                            </button>
+                        </div>
+                    </div>
+                );
+
+            default:
+                const pendingBatches = batches.filter(b => b.status === 'LOCKED');
+                return (
+                    <div className={styles.section}>
+                        <div className={styles.sectionHeader}>
+                            <LuLayoutDashboard /> <h2>Danh sách cần phê duyệt</h2>
+                        </div>
+                        {pendingBatches.length === 0 ? (
+                            <p className={styles.emptyText}>Hiện không có lô hàng nào đang chờ duyệt.</p>
+                        ) : (
+                            <div className={styles.batchGrid}>
+                                {pendingBatches.map(batch => (
+                                    <BatchCard
+                                        key={batch._id}
+                                        batch={batch}
+                                        onMint={handleApproveAndMint}
+                                        isMinting={isMinting && processingId === batch._id}
+                                        isDisabled={processingId !== null && processingId !== batch._id}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+        }
+    };
+
     return (
         <div className={styles.layout}>
-            {/* [TẠO MỚI] Modal Overlay ngay trong Layout */}
             {messageModal.isOpen && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', zIndex: 9999
-                }}>
-                    <div style={{
-                        background: '#fff', padding: '30px', borderRadius: '12px',
-                        minWidth: '300px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                    }}>
-                        <h3 style={{ color: messageModal.type === 'error' ? '#ef4444' : '#10b981' }}>
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <h3 className={messageModal.type === 'error' ? styles.err : styles.ok}>
                             {messageModal.type === 'error' ? 'Thất bại' : 'Thành công'}
                         </h3>
-                        <p style={{ margin: '20px 0', color: '#374151' }}>{messageModal.message}</p>
-                        <button
-                            onClick={() => setMessageModal({ isOpen: false, message: '', type: 'success' })}
-                            style={{ padding: '10px 20px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
-                        >
-                            Đóng
-                        </button>
+                        <p>{messageModal.message}</p>
+                        <button onClick={() => setMessageModal({ ...messageModal, isOpen: false })}>Đóng</button>
                     </div>
                 </div>
             )}
 
-            {/* [GIỮ NGUYÊN] */}
-            <Sidebar account={account} onConnect={connectWallet} isConnecting={isConnecting} />
+            <Sidebar
+                account={account}
+                onConnect={connectWallet}
+                isConnecting={isConnecting}
+                currentTab={currentTab}
+                onTabChange={setCurrentTab}
+            />
 
             <main className={styles.mainContent}>
                 <div className={styles.header}>
@@ -114,7 +190,6 @@ export const InspectorDashboard = () => {
                     <p>Chào mừng bạn quay lại hệ thống duyệt lô hàng</p>
                 </div>
 
-                {/* KHU VỰC THỐNG KÊ [GIỮ NGUYÊN] */}
                 <div className={styles.statsGrid}>
                     <div className={styles.statCard}>
                         <div className={`${styles.iconWrapper} ${styles.blue}`}><LuBox /></div>
@@ -122,7 +197,7 @@ export const InspectorDashboard = () => {
                     </div>
                     <div className={styles.statCard}>
                         <div className={`${styles.iconWrapper} ${styles.yellow}`}><LuClock /></div>
-                        <div className={styles.statInfo}><p>Đang chờ duyệt</p><h3>{stats.pending}</h3></div>
+                        <div className={styles.statInfo}><p>Đang chờ</p><h3>{stats.pending}</h3></div>
                     </div>
                     <div className={styles.statCard}>
                         <div className={`${styles.iconWrapper} ${styles.green}`}><LuCircleCheck /></div>
@@ -130,34 +205,12 @@ export const InspectorDashboard = () => {
                     </div>
                     <div className={styles.statCard}>
                         <div className={`${styles.iconWrapper} ${styles.red}`}><LuTriangleAlert /></div>
-                        <div className={styles.statInfo}><p>Bị từ chối</p><h3>{stats.rejected}</h3></div>
+                        <div className={styles.statInfo}><p>Từ chối</p><h3>{stats.rejected}</h3></div>
                     </div>
                 </div>
 
-                <div className={styles.batchSection}>
-                    <h2>Danh sách lô hàng cần phê duyệt</h2>
-                    {loading ? (
-                        <div className={styles.loadingArea}>Đang tải dữ liệu...</div>
-                    ) : batches.filter(b => b.status === 'LOCKED').length === 0 ? (
-                        <p className={styles.emptyText}>Hiện không có lô hàng nào cần phê duyệt.</p>
-                    ) : (
-                        <div className={styles.batchGrid}>
-                            {batches
-                                .filter(batch => batch.status === 'LOCKED')
-                                .map(batch => (
-                                    <BatchCard
-                                        key={batch._id}
-                                        batch={batch}
-                                        onMint={handleApproveAndMint}
-                                        isMinting={isMinting}
-                                    />
-                                ))}
-                        </div>
-                    )}
-                </div>
+                {renderContent()}
             </main>
         </div>
     );
 };
-
-export default InspectorDashboard;

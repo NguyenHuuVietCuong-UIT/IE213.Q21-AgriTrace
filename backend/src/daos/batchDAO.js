@@ -17,6 +17,13 @@ const batchDao = {
     /**
      * Lấy danh sách lô hàng đang chờ kiểm định theo ID của Inspector
      */
+    findByInspector: async (inspectorId) => {
+        return await Batch.find({ inspectorId })
+            .populate('productId')
+            .populate('inspectorId', 'name email') // Bỏ populate farmId đi, dùng giống hệt hàm pending của bạn
+            .sort({ createdAt: -1 });
+    },
+
     findPendingByInspector: async (inspectorId) => {
         return await Batch.find({ inspectorId })
             .populate('productId')
