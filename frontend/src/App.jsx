@@ -4,6 +4,7 @@ import { InspectorDashboard } from './pages/InspectorDashboard/InspectorDashboar
 import MainLayout from './components/layouts/MainLayout/MainLayout';
 import Home from './pages/Customer/Home';
 import About from './pages/Customer/About';
+import Technology from './pages/Customer/Technology'
 
 import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
 import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
@@ -28,6 +29,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/technology" element={<Technology />} />
         </Route>
 
         {/* Farmer sử dụng FarmerLayout */}

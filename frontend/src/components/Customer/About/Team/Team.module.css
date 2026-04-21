@@ -23,12 +23,18 @@
 }
 
 .teamGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: center; 
+  gap: 3rem 2rem;
+  max-width: 1050px; 
+  margin: 0 auto;
 }
 
 .teamCard {
+  /* Ép mỗi thẻ chiếm khoảng 1/3 màn hình */
+  flex: 0 0 calc(33.333% - 2rem); 
+  min-width: 260px; 
   text-align: center;
   padding: 1rem;
   transition: transform 0.3s ease;
@@ -57,7 +63,7 @@
 .memberName {
   margin: 0 0 0.5rem 0;
   color: #1e293b;
-  font-size: 1.2rem;
+  font-size: 1.15rem; 
 }
 
 .memberRole {
@@ -66,17 +72,19 @@
   font-weight: 500;
 }
 
-/* === RESPONSIVE === */
+/* RESPONSIVE  */
 @media (max-width: 1024px) {
   .teamGrid {
-    grid-template-columns: repeat(2, 1fr);
-    row-gap: 3rem;
+    max-width: 700px; 
+  }
+  .teamCard {
+    flex: 0 0 calc(50% - 2rem); 
   }
 }
 
 @media (max-width: 640px) {
-  .teamGrid {
-    grid-template-columns: 1fr;
+  .teamCard {
+    flex: 0 0 100%; 
   }
   .teamSection {
     margin-top: 4rem;

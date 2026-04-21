@@ -51,9 +51,9 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/how-it-works" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+            <NavLink to="/technology" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
               <LuLightbulb className={styles.navIcon} />
-              <span className={styles.navText}>Cách hoạt động</span>
+              <span className={styles.navText}>Công nghệ</span>
             </NavLink>
           </li>
           <li>
