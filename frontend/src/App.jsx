@@ -6,11 +6,12 @@ import Home from './pages/Customer/Home';
 import About from './pages/Customer/About';
 import Technology from './pages/Customer/Technology'
 
-import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
-import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 import Register from './pages/Auth/Register/Register';
 import Login from './pages/Auth/Login/Login';
 
+import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
+import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
+import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog'
 
 function App() {
   console.log("App AgriTrace đang chạy");
@@ -35,7 +36,7 @@ function App() {
         {/* Farmer sử dụng FarmerLayout */}
         <Route path="/farmer" element={<FarmerLayout />}>
           <Route path="dashboard" element={<FarmerDashboard />} />
-
+          <Route path="farming-logs" element={<FarmingLog />} />
         </Route>
 
         {/* Inspector */}

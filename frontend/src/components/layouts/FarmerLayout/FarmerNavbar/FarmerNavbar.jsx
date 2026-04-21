@@ -51,7 +51,7 @@ const FarmerNavbar = () => {
         </NavLink>
 
         <NavLink
-          to="/farmer/logs"
+          to="/farmer/farming-logs"
           className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
         >
           <LuBook /> Nhật ký canh tác
