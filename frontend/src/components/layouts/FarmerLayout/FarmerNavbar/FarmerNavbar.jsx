@@ -67,10 +67,10 @@ const FarmerNavbar = () => {
 
       {/* Thông tin User & Thông báo */}
       <div className={styles.userSection}>
-        <div className={styles.notification}>
+        {/* <div className={styles.notification}>
           <LuBell size={22} color="#475569" />
           <span className={styles.badge}>3</span>
-        </div>
+        </div> */}
 
         <div className={styles.userInfo}>
           <div className={styles.avatar}>{getAvatarInitials(userName)}</div>

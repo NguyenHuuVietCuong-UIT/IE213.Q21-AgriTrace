@@ -4,10 +4,11 @@ import styles from './Team.module.css';
 const Team = () => {
   // Dữ liệu mảng các thành viên 
   const teamMembers = [
-    { id: 1, name: 'Huỳnh Thanh Dân', role: 'Frontend Designer', initials: 'HD' },
-    { id: 2, name: 'Thành Viên 2', role: 'Smart Contract / Blockchain', initials: 'TV' },
-    { id: 3, name: 'Thành Viên 3', role: 'Web System Developer', initials: 'TV' },
-    { id: 4, name: 'Thành Viên 4', role: 'Backend / Database', initials: 'TV' },
+    { id: 1, name: 'Huỳnh Thanh Dân', role: 'Web 2 / Frontend', initials: 'HD' },
+    { id: 2, name: 'Nguyễn Hữu Việt Cường', role: 'Web System Developer', initials: 'NC' },
+    { id: 3, name: 'Bùi Công Danh', role: 'Web 2 / Backend', initials: 'BD' },
+    { id: 4, name: 'Nguyễn Thành Trung', role: 'Web 3 / Backend', initials: 'NT' },
+    { id: 5, name: 'Lý Đăng Khoa', role: 'Database / Smart Contract ', initials: 'LK' },
   ];
 
   return (
