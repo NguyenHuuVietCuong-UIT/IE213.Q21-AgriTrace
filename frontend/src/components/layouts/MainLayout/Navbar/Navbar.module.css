@@ -13,8 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* Desktop padding */
-  padding: 1.5rem 5rem; 
+  padding: 1rem 5rem;
   background-color: var(--nav-bg-white);
   position: sticky;
   top: 0;
@@ -53,22 +52,37 @@
 }
 
 .navLinks {
-  display: flex;
   list-style: none;
-  gap: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
   margin: 0;
   padding: 0;
 }
 
 .link {
   text-decoration: none;
-  color: var(--nav-link-slate);
+  color: #475569;
   font-weight: 500;
-  transition: color 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .link:hover {
-  color: var(--nav-linkhov-green);
+  color: #10B981;
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.active {
+  color: #10B981 !important;
+  font-weight: 600;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.active .navIcon,
+.active .navText {
+  color: #10B981 !important;
 }
 
 .loginBtn {
@@ -79,10 +93,12 @@
   text-decoration: none;
   appearance: none;
 
-  /* 🔥 FIX KHÁC BIỆT FONT */
-  font-family: inherit;     /* quan trọng */
-  font-size: 0.95rem;       /* set cố định */
-  line-height: 1;           /* tránh lệch chiều cao text */
+  font-family: inherit;
+  /* quan trọng */
+  font-size: 0.95rem;
+  /* set cố định */
+  line-height: 1;
+  /* tránh lệch chiều cao text */
 
   background-color: var(--nav-btn-green);
   color: white;
@@ -97,38 +113,6 @@
 .loginBtn:hover {
   background-color: var(--nav-btnhov-darkgreen);
   transform: translateY(-1px);
-}
-
-/* Responsive */
-
-@media (max-width: 1024px) {
-  .navbar {
-    padding: 1rem 2rem; /* Padding cho tablet */
-  }
-  
-  .navContent {
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    padding: 1rem 1.5rem; /* Padding cho mobile */
-  }
-
-  /* Ẩn các link điều hướng trên mobile */
-  .navLinks {
-    display: none; 
-  }
-
-  .logoText {
-    font-size: 1.25rem; /* Thu nhỏ chữ logo trên mobile */
-  }
-
-  .loginBtn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
 }
 
 .avatarWrapper {
@@ -164,7 +148,7 @@
   right: 0;
   background: white;
   min-width: 200px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   padding: 0.5rem 0;
   z-index: 1001;
@@ -223,4 +207,102 @@
 
 .logoutBtn:hover {
   background-color: #fff1f2;
+}
+
+/* Responsive */
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #475569;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Ẩn icon*/
+.navIcon {
+  display: none;
+}
+
+/* RESPONSIVE: TABLET (1024px) */
+
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+
+  .navLinks {
+    gap: 0.5rem;
+  }
+
+  .link {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* RESPONSIVE: MOBILE (850px) */
+
+@media (max-width: 850px) {
+  .navbar {
+    padding: 0.8rem 1.2rem;
+    height: 65px;
+  }
+
+  .logoText {
+    font-size: 1.25rem;
+  }
+
+  /* Đưa Menu xuống đáy */
+  .navLinks {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    gap: 0;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+  }
+
+  /* Xếp Icon nằm trên Chữ */
+  .link {
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.4rem;
+    background: none;
+    border-radius: 0;
+  }
+
+  /* Bật icon */
+  .navIcon {
+    display: block;
+    font-size: 1.4rem;
+  }
+
+  /* Thu nhỏ chữ lại như các app thực tế */
+  .navText {
+    font-size: 0.7rem;
+  }
+
+  /* Bỏ hiệu ứng nền khi hover/active trên điện thoại */
+  .link:hover,
+  .active {
+    background-color: transparent !important;
+  }
+
+  /* Ép Icon và Chữ đổi màu xanh khi Active trên Mobile */
+  .active .navIcon, 
+  .active .navText {
+    color: #10B981 !important;
+    font-weight: 700;
+  }
 }

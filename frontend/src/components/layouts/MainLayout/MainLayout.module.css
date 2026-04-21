@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+  body {
+    /* Đẩy toàn bộ trang web lên một khoảng đúng bằng chiều cao của thanh Menu dưới đáy (khoảng 60-70px) */
+    padding-bottom: 70px; 
+  }
+}

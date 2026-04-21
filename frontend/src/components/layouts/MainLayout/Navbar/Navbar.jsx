@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './Navbar.module.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { LuSearch, LuLightbulb, LuUsers } from 'react-icons/lu';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -43,9 +44,24 @@ const Navbar = () => {
 
       <div className={styles.navContent}>
         <ul className={styles.navLinks}>
-          <li><a href="#search" className={styles.link}>Tra cứu</a></li>
-          <li><a href="#how-it-works" className={styles.link}>Cách hoạt động</a></li>
-          <li><a href="#about" className={styles.link}>Về chúng tôi</a></li>
+          <li>
+            <NavLink to="/" end className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+              <LuSearch className={styles.navIcon} />
+              <span className={styles.navText}>Tra cứu</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/technology" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+              <LuLightbulb className={styles.navIcon} />
+              <span className={styles.navText}>Công nghệ</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/about" className={({ isActive }) => isActive ? `${styles.link} ${styles.active}` : styles.link}>
+              <LuUsers className={styles.navIcon} />
+              <span className={styles.navText}>Về chúng tôi</span>
+            </NavLink>
+          </li>
         </ul>
 
         {user ? (

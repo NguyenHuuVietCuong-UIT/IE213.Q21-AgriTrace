@@ -10,17 +10,8 @@ import styles from './HeroBanner.module.css';
 
 const HeroBanner = () => {
   const [productId, setProductId] = useState('');
-  // THÊM MỚI: State quản lý loading khi gọi API
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- CODE CŨ (ĐÃ COMMENT) ---
-  /*
-  const handleLookup = () => {
-    console.log("Đang tra cứu mã sản phẩm:", productId);
-  };
-  */
-
-  // --- CODE MỚI: TÍCH HỢP GỌI API BACKEND ---
   const handleLookup = async () => {
     if (!productId.trim()) {
       alert("Vui lòng nhập mã lô hàng để tra cứu!");
@@ -29,8 +20,7 @@ const HeroBanner = () => {
 
     setIsLoading(true);
     try {
-      // Backend khai báo route tra cứu là: GET /api/public/batches/:id
-      // Lưu ý: Người dùng sẽ nhập Batch ID vào ô này
+      // Backend khai báo route tra cứu GET /api/public/batches/:id
       const response = await fetch(`http://localhost:5000/api/public/batches/${productId.trim()}`);
 
       if (!response.ok) {
@@ -40,11 +30,8 @@ const HeroBanner = () => {
       const data = await response.json();
       console.log("Dữ liệu truy xuất thành công từ Backend:", data);
 
-      // Dựa vào schema Product/Farm bạn cấp, data trả về sẽ có cấu trúc:
       // data.product.productName, data.product.farmId.farmName
       alert(`Tra cứu thành công!\nSản phẩm: ${data.product?.productName || 'N/A'}\nNông trại: ${data.product?.farmId?.farmName || 'N/A'}\nTrạng thái: ${data.status}`);
-
-      // Sau này bạn có thể dùng React Router (navigate) để chuyển hướng sang trang chi tiết (Tracking Timeline)
 
     } catch (error) {
       console.error("Lỗi tra cứu:", error);
@@ -84,7 +71,7 @@ const HeroBanner = () => {
           <div className={styles.inputGroup}>
             <input
               type="text"
-              placeholder="Nhập mã lô hàng (VD: 64d...abc)" // Sửa lại placeholder cho phù hợp Mongo ID
+              placeholder="Nhập mã lô hàng" 
               className={styles.productInput}
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
@@ -92,7 +79,6 @@ const HeroBanner = () => {
           </div>
 
           <button onClick={handleLookup} className={styles.lookupBtn} disabled={isLoading}>
-            {/* THÊM MỚI: Đổi text nếu đang loading */}
             <LuSearch /> {isLoading ? "Đang tra cứu..." : "Tra cứu ngay"}
           </button>
 
@@ -122,5 +108,4 @@ const FeatureBadge = ({ icon, title, desc }) => (
     </div>
   </div>
 );
-
 export default HeroBanner;
