@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { LuLeaf, LuLayoutDashboard, LuBook, LuUser, LuBell } from "react-icons/lu";
-import styles from './FarmerNavbar.module.css'; 
+import styles from './FarmerNavbar.module.css';
 
 const FarmerNavbar = () => {
   const [user, setUser] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   // Lấy thông tin user từ localStorage khi component được render
   useEffect(() => {
@@ -24,6 +27,31 @@ const FarmerNavbar = () => {
     const nameParts = name.trim().split(' ');
     if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
     return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+  };
+
+  // Xử lý click outside và thông tin
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setShowDropdown(false);
+    navigate('/'); // Đẩy về trang chủ Customer
   };
 
   return (
@@ -72,13 +100,56 @@ const FarmerNavbar = () => {
           <span className={styles.badge}>3</span>
         </div> */}
 
-        <div className={styles.userInfo}>
-          <div className={styles.avatar}>{getAvatarInitials(userName)}</div>
-          <div className={styles.userDetails}>
-            <span className={styles.userName}>{userName}</span>
-            <span className={styles.userRole}>{userRole}</span>
+        {user ? (
+          <div className={styles.avatarWrapper} ref={dropdownRef}>
+
+            <div
+              className={styles.userInfoTrigger}
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+
+              {/* Đưa thông tin Role và Name lên Navbar*/}
+              <div className={styles.userInfo}>
+                <div className={styles.avatar}>{getAvatarInitials(userName)}</div>
+                <div className={styles.userDetails}>
+                  <span className={styles.userName}>{userName}</span>
+                  <span className={styles.userRole}>
+                    {user.role === 'FARMER' ? 'Nông dân' : 'Kiểm định viên'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Khối Dropdown Menu */}
+            {showDropdown && (
+              <div className={styles.dropdownMenu}>
+                <div className={styles.userInfo}>
+                  <p className={styles.userName}>{user.name}</p>
+                </div>
+                <hr />
+                {user.role === 'FARMER' ? (
+                  <Link to="/" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
+                    Trang chủ khách hàng
+                  </Link>
+                ) : (
+                  <Link to="/inspector" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
+                    Dashboard Kiểm định
+                  </Link>
+                )}
+                <Link to="/profile" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
+                  Thông tin cá nhân
+                </Link>
+                <button onClick={handleLogout} className={styles.logoutBtn}>
+                  Đăng xuất
+                </button>
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          <Link to="/login" className={styles.loginBtn}>
+            Đăng nhập
+          </Link>
+        )}
       </div>
     </nav>
   );
