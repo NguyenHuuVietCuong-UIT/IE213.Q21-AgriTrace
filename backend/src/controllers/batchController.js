@@ -189,18 +189,34 @@ const batchController = {
         const { batchId } = req.params;
         const { location, status } = req.body;
 
+        // ==========================================
+        // VALIDATION: Kiểm tra input đầu vào
+        // ==========================================
+        if (!location || typeof location !== 'string' || location.trim() === '') {
+            return res.status(400).json({ message: 'Thiếu hoặc sai định dạng: location (String)' });
+        }
+        if (!status || typeof status !== 'string' || status.trim() === '') {
+            return res.status(400).json({ message: 'Thiếu hoặc sai định dạng: status (String)' });
+        }
+
         try {
             // 1. Kiểm tra trạng thái lô hàng
             const batch = await batchDao.findByIdWithProduct(batchId);
-            if (!batch || batch.status !== 'MINTED') {
-                return res.status(400).json({ message: 'Lô hàng chưa đúc NFT hoặc không tồn tại' });
+            if (!batch) {
+                return res.status(404).json({ message: 'Lô hàng không tồn tại' });
+            }
+            if (batch.status !== 'MINTED') {
+                return res.status(400).json({ message: 'Lô hàng chưa đúc NFT (status phải là MINTED)' });
+            }
+            if (!batch.tokenId) {
+                return res.status(400).json({ message: 'Lô hàng chưa có tokenId' });
             }
 
             // 2. Thêm log vận chuyển vào DB bằng DAO
             const logData = {
                 action: status,
                 actorId: null, // Hệ thống tự cập nhật
-                location: location,
+                location: location.trim(),
                 timestamp: new Date()
             };
             const updatedBatch = await batchDao.pushLog(batchId, logData);
@@ -216,20 +232,41 @@ const batchController = {
             const newIpfsHash = pinResult.IpfsHash;
 
             // 4. Gọi Smart Contract bằng ethers.js
+            // ==========================================
+            // 4.1 Khởi tạo Provider
             const provider = new ethers.JsonRpcProvider(process.env.ETH_RPC_URL);
+            
+            // 4.2 Nạp ví Admin
             const wallet = new ethers.Wallet(process.env.SYSTEM_PRIVATE_KEY, provider);
+            
+            // 4.3 Kết nối Contract
             const contract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, MINIMAL_ABI, wallet);
 
+            // 4.4 Gọi hàm updateShipping
             const tx = await contract.updateShipping(updatedBatch.tokenId, newIpfsHash);
-            await tx.wait(); // Đợi giao dịch hoàn tất trên mạng lưới
+            
+            // 4.5 Đợi giao dịch hoàn tất trên mạng lưới
+            const receipt = await tx.wait();
 
             // 5. Cập nhật Hash mới vào DB thông qua DAO
-            await batchDao.updateFields(batchId, { ipfsHash: newIpfsHash });
+            await batchDao.updateFields(batchId, { 
+                ipfsHash: newIpfsHash,
+                // Tùy chọn: Lưu lại transaction hash từ blockchain
+                // txHashShipping: receipt.transactionHash
+            });
 
-            return res.json({ success: true, message: 'Cập nhật vận chuyển lên Blockchain thành công!', newIpfsHash });
+            return res.json({ 
+                success: true, 
+                message: 'Cập nhật vận chuyển lên Blockchain thành công!', 
+                newIpfsHash,
+                txHash: receipt.transactionHash  // Trả về TX hash để client xác nhận
+            });
         } catch (err) {
-            console.error("Lỗi cập nhật:", err);
-            return res.status(500).json({ message: 'Lỗi hệ thống', error: err.message });
+            console.error("❌ Lỗi cập nhật vận chuyển:", err);
+            return res.status(500).json({ 
+                message: 'Lỗi hệ thống', 
+                error: err.message 
+            });
         }
     }
 };
