@@ -13,6 +13,8 @@ import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
 import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog'
 
+import ShippingManagement from './pages/Shipping/ShippingManagement';
+
 function App() {
   console.log("App AgriTrace đang chạy");
 
@@ -41,6 +43,9 @@ function App() {
 
         {/* Inspector */}
         <Route path="/inspector" element={<InspectorDashboard />} />
+
+        {/* Shipping Management - Stream 5 */}
+        <Route path="/shipping" element={<ShippingManagement />} />
 
         {/* Trang 404 */}
         <Route path="*" element={
