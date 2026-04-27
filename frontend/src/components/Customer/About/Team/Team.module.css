@@ -1,0 +1,93 @@
+.teamSection {
+  margin-top: 6rem;
+  padding-top: 4rem;
+  border-top: 1px solid #e2e8f0; /* Đường kẻ mỏng phân cách với phần trên */
+}
+
+.teamHeader {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.sectionTitle {
+  font-size: 2.2rem;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.sectionSubtitle {
+  color: #64748b;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.teamGrid {
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: center; 
+  gap: 3rem 2rem;
+  max-width: 1050px; 
+  margin: 0 auto;
+}
+
+.teamCard {
+  /* Ép mỗi thẻ chiếm khoảng 1/3 màn hình */
+  flex: 0 0 calc(33.333% - 2rem); 
+  min-width: 260px; 
+  text-align: center;
+  padding: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.teamCard:hover {
+  transform: translateY(-5px);
+}
+
+.avatarPlaceholder {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 50%;
+  background-color: #ffffff;
+  color: #10b981;
+  border: 4px solid #ecfdf5;
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.memberName {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  font-size: 1.15rem; 
+}
+
+.memberRole {
+  font-size: 0.95rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+/* RESPONSIVE  */
+@media (max-width: 1024px) {
+  .teamGrid {
+    max-width: 700px; 
+  }
+  .teamCard {
+    flex: 0 0 calc(50% - 2rem); 
+  }
+}
+
+@media (max-width: 640px) {
+  .teamCard {
+    flex: 0 0 100%; 
+  }
+  .teamSection {
+    margin-top: 4rem;
+    padding-top: 3rem;
+  }
+}

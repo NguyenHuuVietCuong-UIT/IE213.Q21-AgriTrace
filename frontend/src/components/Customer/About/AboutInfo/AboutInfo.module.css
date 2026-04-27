@@ -1,0 +1,124 @@
+.infoWrapper {
+  width: 100%;
+}
+
+.textGreen { color: #10b981; }
+
+/* HERO */
+.heroSection {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  margin-bottom: 5rem;
+}
+
+.heroContent {
+  flex: 1;
+}
+
+.title {
+  font-size: 2.8rem;
+  line-height: 1.25;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #10b981;
+  font-weight: 700;
+  font-size: 1.5rem;
+  border: 2px dashed #a7f3d0;
+}
+
+
+/* VALUES SECTION */
+.sectionTitle {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 3rem;
+  color: #0f172a;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.valueCard {
+  background: #ffffff;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.valueCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px -8px rgba(16, 185, 129, 0.2);
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  background: #ecfdf5;
+  color: #10b981;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem auto;
+}
+
+.valueCard h3 {
+  margin-bottom: 1rem;
+  color: #1e293b;
+  font-size: 1.3rem;
+}
+
+.valueCard p {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .heroSection {
+    flex-direction: column;
+    text-align: center;
+    gap: 3rem;
+  }
+  .valuesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .title { font-size: 2.2rem; }
+  .valuesGrid { grid-template-columns: 1fr; }
+  .valueCard { padding: 2rem 1.5rem; }
+}

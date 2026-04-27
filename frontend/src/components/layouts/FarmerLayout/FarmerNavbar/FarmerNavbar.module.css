@@ -1,0 +1,387 @@
+.topbar {
+  --nav-bg-white: #ffffff;
+  --nav-icon-green: #10B981;
+  --nav-logotext-dark: #1e293b;
+  --nav-link-slate: #475569;
+  --nav-linkhov-green: #10B981;
+  --nav-shadow: rgba(0, 0, 0, 0.05);
+  
+  --nav-active-bg: rgba(16, 185, 129, 0.1);
+  --nav-hover-bg: rgba(16, 185, 129, 0.05);
+  --nav-avatar-bg: rgba(16, 185, 129, 0.15);
+  --nav-badge-red: #ef4444;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5rem; 
+  background-color: var(--nav-bg-white);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px var(--nav-shadow);
+  height: 70px; 
+}
+
+/* LOGO */
+.logoLink {
+  flex: 1; /* Ép thẻ Link chiếm không gian để cân bằng với khối User bên phải */
+  display: flex;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoIcon {
+  background-color: var(--nav-icon-green);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--nav-logotext-dark);
+  line-height: 1.1;
+}
+
+.portal {
+  font-size: 0.75rem;
+  color: var(--nav-link-slate);
+  font-weight: 500;
+}
+
+/* MENU ĐIỀU HƯỚNG */
+.navLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  text-decoration: none;
+  color: var(--nav-link-slate);
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.navItem svg {
+  font-size: 1.2rem; /* Đồng bộ kích thước Icon */
+}
+
+.navItem:hover {
+  color: var(--nav-linkhov-green);
+  background-color: var(--nav-hover-bg);
+}
+
+.active {
+  color: var(--nav-icon-green);
+  font-weight: 600;
+  background-color: var(--nav-active-bg); /* Thêm nền nhẹ cho nút đang chọn */
+}
+
+/* KHU VỰC USER */
+.userSection {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.notification {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--nav-link-slate);
+  transition: color 0.3s ease;
+}
+
+.notification:hover {
+  color: var(--nav-linkhov-green);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background-color: var(--nav-badge-red);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--nav-bg-white);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.userInfo:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.avatar {
+  background-color: var(--nav-avatar-bg);
+  color: var(--nav-icon-green);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--nav-logotext-dark);
+}
+
+.userRole {
+  font-size: 0.75rem;
+  color: var(--nav-link-slate);
+}
+
+
+/* Dropdown Avater (Đồng bộ với Customer) */
+.avatarWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.avatarBtn {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 2px solid #10b981; /* Màu xanh AgriTrace */
+  padding: 2px;
+  transition: transform 0.2s;
+}
+
+.avatarBtn:hover {
+  transform: scale(1.05);
+}
+
+.userAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: white;
+  min-width: 200px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  z-index: 9999; 
+  border: 1px solid #f1f5f9;
+}
+
+.userInfo {
+  padding: 0.75rem 1rem;
+}
+
+.userName {
+  margin: 0;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.dropdownMenu hr {
+  border: 0;
+  border-top: 1px solid #f1f5f9;
+  margin: 0.5rem 0;
+}
+
+.dropItem {
+  display: block;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  color: #475569;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.dropItem:hover {
+  background-color: #f8fafc;
+  color: #10B981;
+  font-weight: 500;
+}
+
+.logoutBtn {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 0.6rem 1rem;
+  color: #ef4444; /* Màu đỏ cảnh báo */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logoutBtn:hover {
+  background-color: #fff1f2;
+}
+
+/* Đảm bảo Login button vẫn đẹp nếu chưa đăng nhập */
+.loginBtn {
+  background-color: #10B981;
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.loginBtn:hover {
+  background-color: #059669;
+}
+
+/* RESPONSIVE TABLET */
+@media (max-width: 1024px) {
+  .topbar {
+    padding: 1rem 1.5rem; /* Ép lề 2 bên nhỏ lại để nhường chỗ cho giữa */
+  } 
+
+  .portal {
+    display: none; 
+  }
+
+  .navLinks {
+    gap: 0.3rem; /* Kéo các nút sát lại nhau hơn */
+  }
+  
+  .navItem {
+    padding: 0.5rem 0.6rem; 
+    font-size: 0.9rem; /* Thu nhỏ chữ */
+  }
+
+  /* thông tin User phụ */
+  .userSection {
+    gap: 1rem;
+  }
+  
+  .userDetails {
+    display: none; /* ẩn tên */
+  }
+}
+
+/* RESPONSIVE MOBILE
+   Thiết kế Bottom Tab App-like */
+
+/* Đổi từ 768px thành 850px để kích hoạt Bottom Tab sớm hơn */
+@media (max-width: 850px) {
+  .topbar {
+    padding: 0.8rem 1.2rem;
+    height: 65px;
+  }
+
+  .userDetails {
+    display: none; /* Chỉ hiện Avatar, ẩn Tên và Role */
+  }
+
+  .userSection {
+    gap: 1.2rem;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 0.85rem;
+  }
+
+  /* Đưa toàn bộ Menu xuống đáy màn hình */
+  .navLinks {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    background-color: var(--nav-bg-white);
+    box-shadow: 0 -2px 10px var(--nav-shadow);
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    gap: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0.5rem); /* Tương thích iPhone tai thỏ */
+  }
+
+  /* Biến các nút thành dạng Cột (Icon trên, Text dưới) */
+  .navItem {
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.4rem;
+    font-size: 0.7rem; /* Thu nhỏ chữ */
+    background: none;
+    border-radius: 0;
+  }
+
+  .navItem svg {
+    font-size: 1.4rem; /* Phóng to Icon */
+  }
+
+  .navItem:hover {
+    background-color: transparent; /* Bỏ nền hover trên Mobile */
+  }
+
+  .active {
+    background-color: transparent;
+  }
+
+  .dropdownMenu {
+    top: 110%; /* Cho vừa Mobile */
+  }
+}

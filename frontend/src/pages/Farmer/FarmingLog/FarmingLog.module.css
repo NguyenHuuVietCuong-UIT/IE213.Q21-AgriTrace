@@ -1,0 +1,356 @@
+.logContainer {
+  padding: 2rem max(16px, 5%);
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* HEADER */
+
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  color: #1e293b;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.2;
+}
+
+.pageSubtitle {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* STATS GRID */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.statLabel {
+  display: block;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  margin-top: 0;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+  margin: 0;
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+/* Màu sắc — đồng bộ naming convention với Dashboard */
+.bgGreen  { background-color: #ecfdf5; }
+.textGreen { color: #10b981; }
+
+.bgYellow  { background-color: #fff7ed; }
+.textYellow { color: #f59e0b; }
+
+.bgPurple  { background-color: #f3e8ff; }
+.textPurple { color: #a855f7; }
+
+.bgBlue  { background-color: #eff6ff; }
+.textBlue { color: #3b82f6; }
+
+.bgGray  { background-color: #f1f5f9; }
+.textGray { color: #64748b; }
+
+/* FILTER SECTION */
+
+.filterSection {
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.batchSelect {
+  padding: 0.65rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-weight: 500;
+  font-size: 0.95rem;
+  outline: none;
+  min-width: 200px;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.batchSelect:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 160px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.9rem;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.95rem;
+  color: #1e293b;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  border-color: #10b981;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* LOG LIST */
+
+.logList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.logItem {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.logItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.itemIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0; /* tránh overflow text trong flex */
+}
+
+.itemTags {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tagAction {
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tagBatch {
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  background: #f8fafc;
+}
+
+.itemDetails {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.4rem 0;
+  /* Tránh text tràn trên mobile */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemMeta {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.itemDate {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.imageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.imageLink:hover {
+  text-decoration: underline;
+  color: #2563eb;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+/* RESPONSIVE cho TABLET */
+
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    gap: 1rem;
+  }
+
+  .filterSection {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .batchSelect {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* logItem chuyển sang dạng cột khi hẹp */
+  .logItem {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .itemDate {
+    align-self: flex-end;
+  }
+}
+
+/* RESPONSIVE cho MOBILE */
+
+@media (max-width: 640px) {
+  .logContainer {
+    padding: 1.25rem max(16px, 4%);
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  /* Ép 2 cột cố định — đồng bộ Dashboard */
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .statCard {
+    padding: 1rem 0.85rem;
+  }
+
+  .statValue {
+    font-size: 1.6rem;
+  }
+
+  .statIcon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+  }
+
+  .logItem {
+    padding: 1rem;
+  }
+
+  .itemIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .itemDetails {
+    font-size: 0.95rem;
+  }
+
+  /* Ngăn iOS Safari auto-zoom khi tap vào input */
+  .searchInput,
+  .batchSelect {
+    font-size: 16px;
+  }
+}

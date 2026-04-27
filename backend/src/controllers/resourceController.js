@@ -1,5 +1,5 @@
-const farmDao = require('../daos/farmDao');
-const productDao = require('../daos/productDao');
+const farmDao = require('../daos/farmDAO');
+const productDao = require('../daos/productDAO');
 const userDao = require('../daos/userDAO');
 const Farm = require('../models/Farm');
 const Product = require('../models/Product');

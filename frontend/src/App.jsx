@@ -2,11 +2,16 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { InspectorDashboard } from './pages/InspectorDashboard/InspectorDashboard';
 import MainLayout from './components/layouts/MainLayout/MainLayout';
-import Home from './pages/Customer/Home/Home';
-import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
-import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
+import Home from './pages/Customer/Home';
+import About from './pages/Customer/About';
+import Technology from './pages/Customer/Technology'
+
 import Register from './pages/Auth/Register/Register';
 import Login from './pages/Auth/Login/Login';
+
+import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
+import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
+import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog'
 
 function App() {
   console.log("App AgriTrace đang chạy");
@@ -14,6 +19,7 @@ function App() {
   return (
     <Router>
       <Routes>
+
         {/* Tuyến đường Đăng nhập */}
         <Route path="/login" element={<Login />} />
 
@@ -23,11 +29,14 @@ function App() {
         {/* Customer sử dụng MainLayout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/technology" element={<Technology />} />
         </Route>
 
         {/* Farmer sử dụng FarmerLayout */}
         <Route path="/farmer" element={<FarmerLayout />}>
           <Route path="dashboard" element={<FarmerDashboard />} />
+          <Route path="farming-logs" element={<FarmingLog />} />
         </Route>
 
         {/* Inspector */}
