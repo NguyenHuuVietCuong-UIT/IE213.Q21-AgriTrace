@@ -21,19 +21,19 @@ export const Sidebar = ({ account, onConnect, isConnecting, currentTab, onTabCha
                     onClick={() => onTabChange('overview')}
                     className={`${styles.menuItem} ${currentTab === 'overview' ? styles.active : ''}`}
                 >
-                    🏠 Tổng quan
+                    Tổng quan
                 </button>
                 <button
                     onClick={() => onTabChange('history')}
                     className={`${styles.menuItem} ${currentTab === 'history' ? styles.active : ''}`}
                 >
-                    📅 Lịch sử
+                    Lịch sử
                 </button>
                 <button
                     onClick={() => onTabChange('settings')}
                     className={`${styles.menuItem} ${currentTab === 'settings' ? styles.active : ''}`}
                 >
-                    ⚙️ Cài đặt ví
+                    Cài đặt ví
                 </button>
             </nav>
 
@@ -41,7 +41,7 @@ export const Sidebar = ({ account, onConnect, isConnecting, currentTab, onTabCha
                 <div className={styles.walletHeader}>
                     <div className={styles.metaMaskContainer}><MetaMaskIcon /></div>
                     <div className={styles.walletTextGroup}>
-                        <div className={styles.walletLabel}>Ví Inspector</div>
+                        <div className={styles.walletLabel}>Ví MetaMask</div>
                         {account ? (
                             <div className={styles.address}>
                                 {`${account.slice(0, 4)}...${account.slice(-4)}`}

@@ -1,16 +1,30 @@
 .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111827; }
 .statusBadge { background: #FEF9C3; color: #A16207; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
-.info { color: #6B7280; font-size: 0.9rem; margin-bottom: 16px; }
-.gridInfo { display: grid; grid-template-columns: repeat(2, 1fr); background: #F8FAFC; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; }
-.gridInfo small { color: #6B7280; font-size: 0.8rem; }
-.gridInfo p { margin: 4px 0 0; font-weight: 600; font-size: 1rem; color: #111827; }
-.progressArea { margin-bottom: 20px; }
-.progressText { display: flex; justify-content: space-between; font-size: 0.9rem; color: #6B7280; margin-bottom: 8px; }
-.progressText span { font-weight: 700; color: #111827; }
-.progressBar { height: 6px; background: #E5E7EB; border-radius: 3px; overflow: hidden; }
-.progressFill { height: '100%'; background: #111827; height: 100%; }
-.mintBtn { width: 100%; padding: 12px; background: #2A9D8F; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-.mintBtn:disabled { background: #94a3b8; cursor: not-allowed; }
-.mintBtn:hover:not(:disabled) { background: #248b7f; }
+
+/* Styles mới cho phần chi tiết (Detail Section) */
+.detailSection { margin-bottom: 16px; font-size: 0.9rem; color: #374151; }
+.detailSection p { margin: 6px 0; }
+.addressLine { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.mapLink { color: #2563EB; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color 0.2s; }
+.mapLink:hover { color: #1D4ED8; text-decoration: underline; }
+
+/* Thông số lô hàng */
+.gridInfo { display: grid; grid-template-columns: repeat(2, 1fr); background: #F8FAFC; padding: 12px; border-radius: 8px; margin-bottom: 16px; text-align: center; border: 1px solid #f1f5f9; }
+.gridInfo small { color: #6B7280; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.gridInfo p { margin: 4px 0 0; font-weight: 600; font-size: 1.1rem; color: #111827; }
+
+/* Styles mới cho phần Nhật ký (Logs) */
+.logsSection { margin-bottom: 20px; background: #f9fafb; padding: 12px; border-radius: 8px; border-left: 3px solid #2A9D8F; }
+.logsTitle { margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 700; color: #111827; }
+.logList { list-style: none; padding: 0; margin: 0; font-size: 0.85rem; }
+.logItem { display: flex; justify-content: space-between; margin-bottom: 6px; color: #4B5563; }
+.logAction { font-weight: 500; }
+.logDate { color: #9CA3AF; font-size: 0.8rem; }
+.logMore { text-align: center; color: #6B7280; font-style: italic; margin-top: 4px; font-size: 0.8rem; }
+
+/* Button Mint */
+.mintBtn { width: 100%; padding: 12px; background: #2A9D8F; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+.mintBtn:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.7; }
+.mintBtn:hover:not(:disabled) { background: #248b7f; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }

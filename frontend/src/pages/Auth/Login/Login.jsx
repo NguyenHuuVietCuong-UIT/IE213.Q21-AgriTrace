@@ -152,7 +152,7 @@ export default function Login() {
                 {/* Thêm phần Footer chứa Link chuyển sang trang Đăng ký */}
                 <div className={styles.footer}>
                     <span>Chưa có tài khoản? </span>
-                    <Link to="/register" className={styles.link}>Đăng ký Nông dân</Link>
+                    <Link to="/register" className={styles.link}>Đăng ký</Link>
                 </div>
 
             </div>

@@ -1,4 +1,5 @@
 const Batch = require('../models/Batch');
+const Farm = require('../models/Farm');
 
 const batchDao = {
     // ==========================================
@@ -18,17 +19,53 @@ const batchDao = {
      * Lấy danh sách lô hàng đang chờ kiểm định theo ID của Inspector
      */
     findByInspector: async (inspectorId) => {
-        return await Batch.find({ inspectorId })
+        // 1. Lấy danh sách lô hàng và populate thông tin cơ bản
+        const batches = await Batch.find({ inspectorId })
             .populate('productId')
-            .populate('inspectorId', 'name email') // Bỏ populate farmId đi, dùng giống hệt hàm pending của bạn
-            .sort({ createdAt: -1 });
+            .populate('inspectorId', 'name email')
+            .populate('farmerId', 'name email')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const farmerIds = [...new Set(batches.map(b => b.farmerId?._id?.toString()).filter(Boolean))];
+
+        const farms = await Farm.find({ ownerId: { $in: farmerIds } }).select('farmName location ownerId').lean();
+
+        const farmMap = {};
+        farms.forEach(farm => {
+            farmMap[farm.ownerId.toString()] = farm;
+        });
+
+        return batches.map(batch => {
+            const farmerIdStr = batch.farmerId?._id?.toString();
+            batch.farm = farmMap[farmerIdStr] || null;
+            return batch;
+        });
     },
 
     findPendingByInspector: async (inspectorId) => {
-        return await Batch.find({ inspectorId })
+        const batches = await Batch.find({ inspectorId, status: 'LOCKED' })
             .populate('productId')
             .populate('inspectorId', 'name email')
-            .sort({ updatedAt: -1 });
+            .populate('farmerId', 'name email')
+            .sort({ updatedAt: -1 })
+            .lean();
+
+        const farmerIds = [...new Set(batches.map(b => b.farmerId?._id?.toString()).filter(Boolean))];
+
+        // LƯU Ý: Thay 'owner' bằng tên trường thực tế trong Farm.js của bạn
+        const farms = await Farm.find({ ownerId: { $in: farmerIds } }).select('farmName location ownerId').lean();
+
+        const farmMap = {};
+        farms.forEach(farm => {
+            farmMap[farm.ownerId.toString()] = farm;
+        });
+
+        return batches.map(batch => {
+            const farmerIdStr = batch.farmerId?._id?.toString();
+            batch.farm = farmMap[farmerIdStr] || null;
+            return batch;
+        });
     },
 
     /**
