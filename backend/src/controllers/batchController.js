@@ -212,10 +212,17 @@ const batchController = {
                 return res.status(400).json({ message: 'Lô hàng chưa có tokenId' });
             }
 
+            // 1.1 Kiểm tra quyền - Chỉ Inspector của batch này mới được sửa
+            if (batch.inspectorId.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ 
+                    message: 'Bạn không có quyền cập nhật vận chuyển cho lô hàng này. Chỉ Inspector được phép.' 
+                });
+            }
+
             // 2. Thêm log vận chuyển vào DB bằng DAO
+            // ⭐ LƯU Ý: Không gửi actorId=null vì schema không chấp nhận null value
             const logData = {
                 action: status,
-                actorId: null, // Hệ thống tự cập nhật
                 location: location.trim(),
                 timestamp: new Date()
             };

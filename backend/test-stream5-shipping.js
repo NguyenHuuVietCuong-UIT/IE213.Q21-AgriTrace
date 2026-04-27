@@ -17,8 +17,9 @@ const API_BASE_URL = process.env.API_URL || 'http://localhost:8080/api';
 const MONGO_URI = process.env.MONGO_URI;
 
 // Test credentials (bạn cần cập nhật các giá trị này)
-const TEST_JWT_TOKEN = process.env.TEST_JWT_TOKEN || 'your_jwt_token_here';
+const TEST_JWT_TOKEN = process.env.TEST_JWT_TOKEN || 'your_jwt_token_here'; // Token của Inspector owner
 const TEST_BATCH_ID = process.env.TEST_BATCH_ID || '507f1f77bcf86cd799439011'; // Thay bằng batch ID thực tế
+const TEST_UNAUTHORIZED_JWT = process.env.TEST_UNAUTHORIZED_JWT || 'unauthorized_token_here'; // Token từ user khác (Farmer, khác Inspector)
 
 // ==========================================
 // HELPER FUNCTIONS
@@ -270,9 +271,53 @@ const tests = {
         }
     },
 
-    // Test 7: Multiple updates on same batch
+    // Test 7: Authorization - Non-owner Inspector cannot update
+    async test_unauthorized_inspector() {
+        logTest('Test 7: Authorization - Non-owner Inspector cannot update', '⏳');
+        
+        // ⚠️  NOTE: TEST_UNAUTHORIZED_JWT phải là token từ user KHÁC (không phải Inspector owner)
+        if (!TEST_UNAUTHORIZED_JWT || TEST_UNAUTHORIZED_JWT === 'unauthorized_token_here') {
+            logTest('Test 7: Authorization - Non-owner Inspector cannot update', '⏽');
+            console.log('   ⊘ Skipped: Set TEST_UNAUTHORIZED_JWT env variable to test authorization');
+            return null; // Null = skipped
+        }
+        
+        try {
+            const payload = {
+                location: "Kho lạnh Co.opMart",
+                status: "Đang vận chuyển"
+            };
+
+            await axios.post(
+                `${API_BASE_URL}/batches/${TEST_BATCH_ID}/shipping`,
+                payload,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${TEST_UNAUTHORIZED_JWT}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            logTest('Test 7: Authorization - Non-owner Inspector cannot update', '❌');
+            console.log('   ⚠️  Expected 403 error, but request succeeded');
+            return false;
+        } catch (error) {
+            if (error.response && error.response.status === 403) {
+                logTest('Test 7: Authorization - Non-owner Inspector cannot update', '✅');
+                console.log('   ✅ Correctly rejected (Authorization denied)');
+                return true;
+            } else {
+                logTest('Test 7: Authorization - Non-owner Inspector cannot update', '❌');
+                logError(error);
+                return false;
+            }
+        }
+    },
+
+    // Test 8: Multiple updates on same batch
     async test_multiple_updates() {
-        logTest('Test 7: Multiple updates on same batch', '⏳');
+        logTest('Test 8: Multiple updates on same batch', '⏳');
         
         try {
             const updates = [
@@ -356,6 +401,9 @@ async function runAllTests() {
     
     results.push(await tests.test_invalid_batch_id());
     await sleep(500);
+
+    results.push(await tests.test_unauthorized_inspector());
+    await sleep(500);
     
     // results.push(await tests.test_multiple_updates()); // Comment out if not testing multiple updates
     
@@ -364,17 +412,25 @@ async function runAllTests() {
     console.log('  📊 TEST SUMMARY');
     console.log('='.repeat(70));
     
-    const passed = results.filter(r => r).length;
-    const total = results.length;
-    const percentage = ((passed / total) * 100).toFixed(2);
+    const passed = results.filter(r => r === true).length;
+    const failed = results.filter(r => r === false).length;
+    const skipped = results.filter(r => r === null).length;
+    const total = results.filter(r => r !== null).length;
+    const percentage = total > 0 ? ((passed / total) * 100).toFixed(2) : '0.00';
     
     console.log(`\n✅ Passed: ${passed}/${total} (${percentage}%)`);
-    console.log(`❌ Failed: ${total - passed}/${total}\n`);
+    console.log(`❌ Failed: ${failed}/${total}`);
+    if (skipped > 0) {
+        console.log(`⏽ Skipped: ${skipped}`);
+    }
+    console.log('');
     
-    if (passed === total) {
+    if (failed === 0 && total > 0) {
         console.log('🎉 All tests passed! Stream 5 is ready for production.\n');
-    } else {
+    } else if (failed > 0) {
         console.log('⚠️  Some tests failed. Please review the logs above.\n');
+    } else {
+        console.log('ℹ️  No tests ran. Please configure TEST_JWT_TOKEN and TEST_BATCH_ID.\n');
     }
     
     console.log('='.repeat(70) + '\n');
