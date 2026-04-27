@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { LuLeaf, LuLayoutDashboard, LuBook, LuUser, LuBell } from "react-icons/lu";
 import styles from './FarmerNavbar.module.css';
+import { AgriTraceIcon } from '../../../Icons/Icons';
 
 const FarmerNavbar = () => {
   const [user, setUser] = useState(null);
@@ -60,7 +61,7 @@ const FarmerNavbar = () => {
       <Link to="/" className={styles.logoLink}>
         <div className={styles.logoGroup}>
           <div className={styles.logoIcon}>
-            <LuLeaf size={24} />
+            <AgriTraceIcon />
           </div>
           <div className={styles.logoText}>
             <span className={styles.brand}>AgriTrace</span>

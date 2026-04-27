@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+  .layoutWrapper {
+    /* Đẩy nội dung lên một khoảng bằng chiều cao của Bottom Bar */
+    padding-bottom: 70px; 
+  }
+}

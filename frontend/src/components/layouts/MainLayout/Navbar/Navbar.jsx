@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './Navbar.module.css';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { LuSearch, LuLightbulb, LuUsers } from 'react-icons/lu';
+import { AgriTraceIcon } from '../../../Icons/Icons';
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -38,7 +39,9 @@ const Navbar = () => {
     <nav className={styles.navbar}>
       {/* Khối Logo - Nhấn vào quay về Home */}
       <Link to="/" className={styles.logoContainer} style={{ textDecoration: 'none' }}>
-        <div className={styles.logoIcon}>LOGO</div>
+        <div className={styles.logoIcon}>
+          <AgriTraceIcon />
+        </div>
         <span className={styles.logoText}>AgriTrace</span>
       </Link>
 

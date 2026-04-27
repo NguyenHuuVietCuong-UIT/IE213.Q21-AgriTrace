@@ -1,4 +1,4 @@
-.sidebar { 
+.navbar { 
     width: 100%; height: 80px; background: white; padding: 0 2rem;
     position: sticky; top: 0; border-bottom: 1px solid #e2e8f0;
     display: flex; align-items: center; justify-content: space-between;
@@ -13,7 +13,7 @@
 .menuItem { 
     background: none; border: none; padding: 10px 30px; border-radius: 8px;
     color: #64748b; font-weight: 600; cursor: pointer; transition: 0.2s;
-    font-size: 1rem;
+    font-size: 1rem; text-decoration: none;
 }
 .menuItem:hover { background: #f1f5f9; }
 .menuItem.active { background: #ecfdf5; color: #10b981; }
@@ -30,11 +30,10 @@
     .logoTextSub { display: none; }
     
     .menu { order: 3; width: 100%; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 10px; justify-content: space-around; }
-    .menuItem { flex: 1; font-size: 0.75rem; padding: 8px 5px; }
+    .menuItem { flex: 1; font-size: 0.75rem; padding: 8px 5px; text-align: center; }
     
-    /* XÓA dòng .walletTextGroup { display: none; } cũ đi và THAY BẰNG ĐOẠN NÀY: */
-    .walletLabel { display: none; } /* Chỉ ẩn chữ "Ví Inspector" cho gọn */
-    .walletTextGroup { display: flex; align-items: center; } /* Giữ lại địa chỉ ví hoặc nút bấm */
+    .walletLabel { display: none; }
+    .walletTextGroup { display: flex; align-items: center; }
     .address { font-size: 0.75rem; }
-    .miniConnect { font-size: 0.7rem; padding: 4px 6px; } /* Thu nhỏ nút bấm một chút */
+    .miniConnect { font-size: 0.7rem; padding: 4px 6px; }
 }

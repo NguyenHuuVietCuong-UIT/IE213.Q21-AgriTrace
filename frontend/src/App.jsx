@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { InspectorDashboard } from './pages/InspectorDashboard/InspectorDashboard';
 import MainLayout from './components/layouts/MainLayout/MainLayout';
 import Home from './pages/Customer/Home';
 import About from './pages/Customer/About';
@@ -11,7 +10,12 @@ import Login from './pages/Auth/Login/Login';
 
 import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
 import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
-import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog'
+import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog';
+
+import InspectorLayout from './components/layouts/InspectorLayout/InspectorLayout';
+import { InspectorHistory } from './pages/InspectorDashboard/InspectorHistory';
+import { InspectorSettings } from './pages/InspectorDashboard/InspectorSettings';
+import { InspectorDashboard } from './pages/InspectorDashboard/InspectorDashboard';
 
 function App() {
   console.log("App AgriTrace đang chạy");
@@ -39,8 +43,14 @@ function App() {
           <Route path="farming-logs" element={<FarmingLog />} />
         </Route>
 
-        {/* Inspector */}
-        <Route path="/inspector" element={<InspectorDashboard />} />
+        {/* Inspector sử dụng InspectorLayout */}
+        <Route path="/inspector" element={<InspectorLayout />}>
+          {/* Dashboard mặc định */}
+          <Route index element={<InspectorDashboard />} />
+          <Route path="dashboard" element={<InspectorDashboard />} />
+          <Route path="history" element={<InspectorHistory />} />
+          <Route path="settings" element={<InspectorSettings />} />
+        </Route>
 
         {/* Trang 404 */}
         <Route path="*" element={
