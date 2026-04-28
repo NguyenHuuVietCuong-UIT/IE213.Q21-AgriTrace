@@ -51,7 +51,7 @@ const ShippingUpdateModal = ({ isOpen, onClose, onSubmit, batchId, isLoading = f
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
