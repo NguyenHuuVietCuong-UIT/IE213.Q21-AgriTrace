@@ -65,16 +65,58 @@ export const useWeb3 = () => {
         setBalance('0');
     };
 
+    const SEPOLIA_CHAIN_ID = '0xaa36a7';
+
     const connectWallet = async () => {
         setIsConnecting(true);
         try {
             if (typeof window.ethereum !== 'undefined') {
+                // 1. Yêu cầu kết nối tài khoản
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // 2. Kiểm tra mạng hiện tại
+                const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+                if (currentChainId !== SEPOLIA_CHAIN_ID) {
+                    try {
+                        // 3. Yêu cầu MetaMask chuyển sang Sepolia
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: SEPOLIA_CHAIN_ID }],
+                        });
+                    } catch (switchError) {
+                        // Mã lỗi 4902 nghĩa là mạng chưa được thêm vào MetaMask
+                        if (switchError.code === 4902) {
+                            try {
+                                await window.ethereum.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [
+                                        {
+                                            chainId: SEPOLIA_CHAIN_ID,
+                                            chainName: 'Sepolia Test Network',
+                                            nativeCurrency: {
+                                                name: 'SepoliaETH',
+                                                symbol: 'SepoliaETH',
+                                                decimals: 18,
+                                            },
+                                            rpcUrls: ['https://rpc.sepolia.org'],
+                                            blockExplorerUrls: ['https://sepolia.etherscan.io'],
+                                        },
+                                    ],
+                                });
+                            } catch (addError) {
+                                console.error("Không thể thêm mạng Sepolia:", addError);
+                            }
+                        }
+                        console.error("Lỗi chuyển mạng:", switchError);
+                    }
+                }
+
                 setAccount(accounts[0]);
                 await fetchNetwork();
                 await fetchBalance(accounts[0]);
             } else {
-                alert("Vui lòng cài đặt tiện ích mở rộng MetaMask trên trình duyệt để tiếp tục!");
+                alert("Vui lòng cài đặt tiện ích mở rộng MetaMask!");
             }
         } catch (error) {
             console.error("Lỗi kết nối ví:", error);
