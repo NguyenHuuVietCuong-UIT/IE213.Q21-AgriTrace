@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import styles from './Register.module.css';
 
-const API_URL = 'http://localhost:5000/api/user';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
     // Thêm vai trò DELIVERER vào state mặc định

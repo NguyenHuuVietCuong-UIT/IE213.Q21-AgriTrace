@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import styles from './Login.module.css';
 
-const API_URL = 'http://localhost:5000/api/user';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
     const [role, setRole] = useState('FARMER'); // Mặc định là Farmer
