@@ -6,6 +6,10 @@ const authController = require('../controllers/userController');
 router.post('/farmer/register', authController.registerFarmer);
 router.post('/farmer/login', authController.loginFarmer);
 
+// Routes cho Deliverer (Web2)
+router.post('/deliverer/register', authController.registerDeliverer);
+router.post('/deliverer/login', authController.loginDeliverer);
+
 // Routes cho Inspector (Web3)
 router.post('/inspector/register', authController.registerInspector);
 router.post('/inspector/request-nonce', authController.requestNonce);

@@ -12,6 +12,8 @@ import FarmerLayout from './components/layouts/FarmerLayout/FarmerLayout';
 import FarmerDashboard from './pages/Farmer/FarmerDashboard/FarmerDashboard';
 import FarmingLog from './pages/Farmer/FarmingLog/FarmingLog';
 
+import ShippingManagement from './pages/Shipping/ShippingManagement';
+
 import InspectorLayout from './components/layouts/InspectorLayout/InspectorLayout';
 import { InspectorHistory } from './pages/InspectorDashboard/InspectorHistory';
 import { InspectorSettings } from './pages/InspectorDashboard/InspectorSettings';
@@ -51,6 +53,9 @@ function App() {
           <Route path="history" element={<InspectorHistory />} />
           <Route path="settings" element={<InspectorSettings />} />
         </Route>
+
+        {/* Shipping Management - Stream 5 */}
+        <Route path="/shipping" element={<ShippingManagement />} />
 
         {/* Trang 404 */}
         <Route path="*" element={

@@ -6,12 +6,13 @@ import styles from './Register.module.css';
 const API_URL = 'http://localhost:5000/api/user';
 
 export default function Register() {
-    const [role, setRole] = useState('FARMER'); // Thêm state quản lý Role
+    // Thêm vai trò DELIVERER vào state mặc định
+    const [role, setRole] = useState('FARMER');
 
-    // State cho Farmer
+    // State cho Web2 (Farmer & Deliverer)
     const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
-    // State cho Inspector
+    // State cho Web3 (Inspector)
     const [inspectorName, setInspectorName] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
 
@@ -21,8 +22,8 @@ export default function Register() {
 
     const navigate = useNavigate();
 
-    // --- LUỒNG 1: ĐĂNG KÝ NÔNG DÂN ---
-    const handleFarmerSubmit = async (e) => {
+    // --- LUỒNG 1: ĐĂNG KÝ WEB2 (FARMER / DELIVERER) ---
+    const handleWeb2Submit = async (e) => {
         e.preventDefault();
         setError(''); setSuccess('');
 
@@ -32,7 +33,12 @@ export default function Register() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${API_URL}/farmer/register`, {
+            // Xác định endpoint dựa trên role đang chọn
+            const endpoint = role === 'DELIVERER'
+                ? `${API_URL}/deliverer/register`
+                : `${API_URL}/farmer/register`;
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password }),
@@ -41,7 +47,8 @@ export default function Register() {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || 'Đăng ký thất bại');
 
-            setSuccess('Đăng ký Nông dân thành công! Đang chuyển hướng...');
+            const roleName = role === 'DELIVERER' ? 'Người vận chuyển' : 'Nông dân';
+            setSuccess(`Đăng ký ${roleName} thành công! Đang chuyển hướng...`);
             setTimeout(() => navigate('/login'), 2000);
         } catch (err) {
             setError(err.message);
@@ -50,7 +57,7 @@ export default function Register() {
         }
     };
 
-    // --- LUỒNG 2: ĐĂNG KÝ KIỂM ĐỊNH VIÊN ---
+    // --- LUỒNG 2: ĐĂNG KÝ KIỂM ĐỊNH VIÊN (WEB3) ---
     const connectWallet = async () => {
         setError('');
         if (!window.ethereum) return setError('Vui lòng cài đặt ví MetaMask!');
@@ -95,7 +102,7 @@ export default function Register() {
             <div className={styles.registerCard}>
                 <h2 className={styles.title}>Đăng ký AgriTrace</h2>
 
-                {/* Tab chuyển đổi vai trò */}
+                {/* Tab chuyển đổi vai trò (3 Tabs) */}
                 <div style={{ display: 'flex', marginBottom: '1.5rem', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#f3f4f6' }}>
                     <button
                         style={{ flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 500, backgroundColor: role === 'FARMER' ? '#10b981' : 'transparent', color: role === 'FARMER' ? 'white' : '#6b7280' }}
@@ -104,21 +111,27 @@ export default function Register() {
                         Nông dân (Web2)
                     </button>
                     <button
+                        style={{ flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 500, backgroundColor: role === 'DELIVERER' ? '#3b82f6' : 'transparent', color: role === 'DELIVERER' ? 'white' : '#6b7280' }}
+                        onClick={() => { setRole('DELIVERER'); setError(''); setSuccess(''); }}
+                    >
+                        Vận chuyển (Web2)
+                    </button>
+                    <button
                         style={{ flex: 1, padding: '0.75rem', border: 'none', cursor: 'pointer', fontWeight: 500, backgroundColor: role === 'INSPECTOR' ? '#f5841f' : 'transparent', color: role === 'INSPECTOR' ? 'white' : '#6b7280' }}
                         onClick={() => { setRole('INSPECTOR'); setError(''); setSuccess(''); }}
                     >
-                        Kiểm định viên (Web3)
+                        Kiểm định (Web3)
                     </button>
                 </div>
 
                 {error && <div className={styles.errorMessage}>{error}</div>}
                 {success && <div className={styles.successMessage}>{success}</div>}
 
-                {/* FORM FARMER */}
-                {role === 'FARMER' ? (
-                    <form onSubmit={handleFarmerSubmit} className={styles.form}>
+                {/* FORM WEB 2 (FARMER & DELIVERER) */}
+                {role === 'FARMER' || role === 'DELIVERER' ? (
+                    <form onSubmit={handleWeb2Submit} className={styles.form}>
                         <div className={styles.inputGroup}>
-                            <label>Họ và tên</label>
+                            <label>Họ và tên {role === 'DELIVERER' ? 'Người vận chuyển' : ''}</label>
                             <input type="text" required placeholder="Nhập họ và tên"
                                 value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                         </div>
@@ -137,12 +150,12 @@ export default function Register() {
                             <input type="password" required placeholder="Nhập lại mật khẩu"
                                 value={formData.confirmPassword} onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })} />
                         </div>
-                        <button type="submit" className={styles.submitBtn} disabled={loading || success}>
-                            {loading ? 'Đang xử lý...' : 'Đăng ký Nông dân'}
+                        <button type="submit" className={styles.submitBtn} disabled={loading || success} style={{ backgroundColor: role === 'DELIVERER' ? '#3b82f6' : '#10b981' }}>
+                            {loading ? 'Đang xử lý...' : `Đăng ký ${role === 'DELIVERER' ? 'Người vận chuyển' : 'Nông dân'}`}
                         </button>
                     </form>
                 ) : (
-                    /* FORM INSPECTOR */
+                    /* FORM INSPECTOR (GIỮ NGUYÊN) */
                     <form onSubmit={handleInspectorSubmit} className={styles.form}>
                         <div className={styles.inputGroup}>
                             <label>Họ và tên Kiểm định viên</label>

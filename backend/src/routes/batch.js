@@ -15,4 +15,11 @@ router.post('/:batchId/pin', verifyToken, requireRole('INSPECTOR'), batchControl
 router.post('/:batchId/mint', verifyToken, requireRole('INSPECTOR'), batchController.confirmMint);
 router.get('/inspector-all', verifyToken, requireRole('INSPECTOR'), batchController.getAllInspectorBatches);
 
+// Route cho Cập nhật Vận chuyển (Stream 5) - Hệ thống tự động
+// POST /api/batches/:batchId/shipping
+router.post('/:batchId/shipping', verifyToken, requireRole(['INSPECTOR', 'DELIVERER']), batchController.updateShippingLog);
+
+// Thêm route lấy chi tiết 1 lô hàng để DELIVERER tìm kiếm
+router.get('/:batchId', verifyToken, batchController.getBatchById);
+
 module.exports = router;

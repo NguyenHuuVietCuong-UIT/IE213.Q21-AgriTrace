@@ -47,18 +47,19 @@ const verifyToken = async (req, res, next) => {
  * Lưu ý: BẮT BUỘC phải gọi sau middleware verifyToken (vì cần req.user)
  * * @param {String} role - Vai trò yêu cầu (VD: 'FARMER', 'INSPECTOR', 'ADMIN')
  */
-const requireRole = (role) => {
+const requireRole = (roles) => {
     return (req, res, next) => {
-        // Kiểm tra req.user (được gắn từ verifyToken) và khớp Role
-        if (!req.user || req.user.role !== role) {
+        // Chuyển string thành array nếu truyền vào 1 role duy nhất
+        const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
             return res.status(403).json({
-                message: `Từ chối truy cập: Chỉ tài khoản cấp [${role}] mới có quyền thực hiện hành động này.`
+                message: `Từ chối truy cập: Chỉ tài khoản cấp [${allowedRoles.join(', ')}] mới có quyền thực hiện hành động này.`
             });
         }
         next();
     };
 };
-
 // ============================================================================
 // NHÓM 2: MIDDLEWARE BẢO MẬT & KIỂM SOÁT LƯU LƯỢNG (SECURITY & TRAFFIC CONTROL)
 // ============================================================================

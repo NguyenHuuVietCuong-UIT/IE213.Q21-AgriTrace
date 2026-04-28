@@ -81,7 +81,65 @@ const authController = {
             return res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
         }
     },
+    // ==========================================
+    // LOGIC CHO NGƯỜI VẬN CHUYỂN (DELIVERER - WEB2)
+    // ==========================================
 
+    registerDeliverer: async (req, res) => {
+        const { email, name, password } = req.body;
+
+        if (!email || !name || !password) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ email, tên và mật khẩu' });
+        }
+
+        try {
+            const existing = await userDao.findByEmail(email);
+            if (existing) {
+                return res.status(400).json({ message: 'Email này đã được đăng ký' });
+            }
+
+            const hashed = await bcrypt.hash(password, 10);
+
+            // Truyền role là DELIVERER
+            const deliverer = await userDao.createUser({
+                email,
+                name,
+                passwordHash: hashed,
+                role: 'DELIVERER'
+            });
+
+            return res.status(201).json({
+                user: { id: deliverer._id, email: deliverer.email, name: deliverer.name, role: deliverer.role }
+            });
+        } catch (err) {
+            return res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
+        }
+    },
+
+    loginDeliverer: async (req, res) => {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp email và mật khẩu' });
+        }
+
+        try {
+            // Chỉ tìm user có role là DELIVERER
+            const user = await userDao.findByEmailAndRole(email, 'DELIVERER');
+
+            if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+                return res.status(401).json({ message: 'Thông tin đăng nhập không hợp lệ hoặc sai vai trò' });
+            }
+
+            const token = getJwt(user);
+            return res.json({
+                token,
+                user: { id: user._id, email: user.email, name: user.name, role: user.role }
+            });
+        } catch (err) {
+            return res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
+        }
+    },
     // ==========================================
     // LOGIC CHO NHÀ KIỂM ĐỊNH (INSPECTOR - WEB3)
     // ==========================================
