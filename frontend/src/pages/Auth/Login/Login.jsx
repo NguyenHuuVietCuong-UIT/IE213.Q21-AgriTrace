@@ -63,7 +63,7 @@ export default function Login() {
             const walletAddress = accounts[0];
 
             // 1. Lấy mã Nonce từ server
-            const resNonce = await fetch(`${API_URL}/inspector/request-nonce`, {
+            const resNonce = await fetch(`${API_URL}/user/inspector/request-nonce`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ walletAddress }),
