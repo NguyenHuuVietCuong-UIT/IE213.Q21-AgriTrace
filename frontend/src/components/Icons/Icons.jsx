@@ -1,4 +1,4 @@
-import metamask from "./MEtaMaskIcon.svg";
+import metamask from "./MetaMaskIcon.svg";
 import agritrace from "./AgriTraceIcon.svg";
 
 export const MetaMaskIcon = () => (
