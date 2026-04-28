@@ -25,7 +25,7 @@ const HeroBanner = () => {
     setResultData(null); // Reset dữ liệu cũ trước khi tra cứu mới
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API}/public/batches/${targetId.trim()}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/public/batches/${targetId.trim()}`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
