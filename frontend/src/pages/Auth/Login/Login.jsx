@@ -77,7 +77,7 @@ export default function Login() {
             const signature = await signer.signMessage(message);
 
             // 3. Gửi chữ ký lên server để xác thực
-            const resVerify = await fetch(`${API_URL}/inspector/verify`, {
+            const resVerify = await fetch(`${API_URL}/user/inspector/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ walletAddress, signature }),
