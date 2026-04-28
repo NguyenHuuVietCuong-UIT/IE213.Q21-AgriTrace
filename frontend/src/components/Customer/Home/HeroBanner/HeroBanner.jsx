@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LuSearch, LuShieldCheck, LuScroll, LuSprout, LuScanQrCode, LuX, LuExternalLink, LuBox, LuClipboardList } from "react-icons/lu";
+import { Html5QrcodeScanner } from 'html5-qrcode';
 import styles from './HeroBanner.module.css';
 
 const HeroBanner = () => {
@@ -8,8 +9,14 @@ const HeroBanner = () => {
   const [resultData, setResultData] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const handleLookup = async () => {
-    if (!productId.trim()) {
+  // State quản lý việc hiển thị modal quét QR
+  const [showScanner, setShowScanner] = useState(false);
+
+  const handleLookup = async (idToSearch) => {
+    // Xử lý logic để nhận id từ string (khi quét QR) hoặc từ state productId (khi click nút)
+    const targetId = typeof idToSearch === 'string' ? idToSearch : productId;
+
+    if (!targetId || !targetId.trim()) {
       alert("Vui lòng nhập mã lô hàng để tra cứu!");
       return;
     }
@@ -18,7 +25,7 @@ const HeroBanner = () => {
     setResultData(null); // Reset dữ liệu cũ trước khi tra cứu mới
 
     try {
-      const response = await fetch(`http://localhost:5000/api/public/batches/${productId.trim()}`);
+      const response = await fetch(`http://localhost:5000/api/public/batches/${targetId.trim()}`);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -28,7 +35,7 @@ const HeroBanner = () => {
       const data = await response.json();
       console.log("Dữ liệu nhận từ API:", data);
 
-      // Quan trọng: Lưu dữ liệu và mở Modal
+      // Lưu dữ liệu và mở Modal kết quả
       setResultData(data);
       setShowModal(true);
 
@@ -39,6 +46,43 @@ const HeroBanner = () => {
       setIsLoading(false);
     }
   };
+
+  // Khởi tạo và dọn dẹp Scanner khi mở/đóng modal quét QR
+  useEffect(() => {
+    let scanner = null;
+
+    if (showScanner) {
+      scanner = new Html5QrcodeScanner(
+        "qr-reader",
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+          supportedScanTypes: [0, 1] // 0: Camera, 1: File
+        },
+        false
+      );
+
+      scanner.render(
+        (decodedText) => {
+          // Khi quét hoặc tải ảnh thành công
+          setProductId(decodedText);
+          setShowScanner(false); // Đóng modal quét QR
+          scanner.clear();       // Tắt camera/dọn dẹp scanner
+          handleLookup(decodedText); // Tự động gọi API tra cứu bằng mã vừa quét
+        },
+        (errorMessage) => {
+          // Bỏ qua các lỗi frame trong quá trình camera đang tìm kiếm QR
+        }
+      );
+    }
+
+    // Cleanup function để tắt camera khi component unmount hoặc đóng modal
+    return () => {
+      if (scanner) {
+        scanner.clear().catch(error => console.error("Lỗi khi đóng scanner: ", error));
+      }
+    };
+  }, [showScanner]);
 
   return (
     <section className={styles.heroContainer}>
@@ -68,17 +112,42 @@ const HeroBanner = () => {
             <LuSearch /> {isLoading ? "Đang tra cứu..." : "Tra cứu ngay"}
           </button>
           <div className={styles.divider}><span>hoặc</span></div>
-          <button className={styles.qrBtn}><LuScanQrCode /> Tải lên mã QR</button>
+          <button onClick={() => setShowScanner(true)} className={styles.qrBtn}>
+            <LuScanQrCode /> Quét / Tải mã QR lên
+          </button>
         </div>
       </div>
 
-      {/* MODAL KẾT QUẢ - ĐÃ FIX ĐƯỜNG DẪN DỮ LIỆU */}
+      {/* MODAL QUÉT QR */}
+      {showScanner && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent} style={{ maxWidth: '400px' }}>
+            <div className={styles.modalHeader}>
+              <h3><LuScanQrCode /> Quét mã QR</h3>
+              <button className={styles.closeBtn} onClick={() => setShowScanner(false)}>
+                <LuX size={24} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {/* Vùng hiển thị Camera hoặc Upload File của thư viện */}
+              <div id="qr-reader" style={{ width: "100%" }}></div>
+              <p style={{ textAlign: 'center', marginTop: '10px', fontSize: '14px', color: '#666' }}>
+                Đưa mã QR lô hàng vào khung hình hoặc chọn tải ảnh từ thiết bị của bạn.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KẾT QUẢ */}
       {showModal && resultData && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
               <h3><LuClipboardList /> Thông tin chi tiết lô hàng</h3>
-              <button className={styles.closeBtn} onClick={() => setShowModal(false)}><LuX size={24} /></button>
+              <button className={styles.closeBtn} onClick={() => setShowModal(false)}>
+                <LuX size={24} />
+              </button>
             </div>
 
             <div className={styles.modalBody}>
