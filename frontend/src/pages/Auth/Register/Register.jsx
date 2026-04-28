@@ -35,8 +35,8 @@ export default function Register() {
         try {
             // Xác định endpoint dựa trên role đang chọn
             const endpoint = role === 'DELIVERER'
-                ? `${API_URL}/deliverer/register`
-                : `${API_URL}/farmer/register`;
+                ? `${API_URL}/user/deliverer/register`
+                : `${API_URL}/user/farmer/register`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -79,7 +79,7 @@ export default function Register() {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/inspector/register`, {
+            const response = await fetch(`${API_URL}/user/inspector/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: inspectorName, walletAddress }),

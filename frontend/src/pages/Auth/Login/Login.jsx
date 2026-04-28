@@ -22,8 +22,8 @@ export default function Login() {
         try {
             // Chọn endpoint dựa trên Tab đang chọn
             const endpoint = role === 'DELIVERER'
-                ? `${API_URL}/deliverer/login`
-                : `${API_URL}/farmer/login`;
+                ? `${API_URL}/user/deliverer/login`
+                : `${API_URL}/user/farmer/login`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
