@@ -85,7 +85,13 @@ const Navbar = () => {
                 <div className={styles.userInfo}>
                   <p className={styles.userName}>{user.name}</p>
                   <p className={styles.userRole}>
-                    {user.role === 'FARMER' ? 'Nông dân' : 'Kiểm định viên'}
+                    {user.role === 'FARMER'
+                      ? 'Nông dân'
+                      : user.role === 'INSPECTOR'
+                        ? 'Kiểm định viên'
+                        : user.role === 'DELIVERER'
+                          ? 'Người vận chuyển'
+                          : 'Không xác định'}
                   </p>
                 </div>
                 <hr />
@@ -93,14 +99,15 @@ const Navbar = () => {
                   <Link to="/farmer/dashboard" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
                     Dashboard Nông dân
                   </Link>
-                ) : (
+                ) : user.role === 'INSPECTOR' ? (
                   <Link to="/inspector" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
                     Dashboard Kiểm định
                   </Link>
-                )}
-                <Link to="/profile" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
-                  Thông tin cá nhân
-                </Link>
+                ) : user.role === 'DELIVERER' ? (
+                  <Link to="/shipping" className={styles.dropItem} onClick={() => setShowDropdown(false)}>
+                    Dashboard Vận chuyển
+                  </Link>
+                ) : null}
                 <button onClick={handleLogout} className={styles.logoutBtn}>
                   Đăng xuất
                 </button>
