@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import styles from './Login.module.css';
 
-const API_URL = 'http://localhost:5000/api/user';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
     const [role, setRole] = useState('FARMER'); // Mặc định là Farmer
@@ -22,8 +22,8 @@ export default function Login() {
         try {
             // Chọn endpoint dựa trên Tab đang chọn
             const endpoint = role === 'DELIVERER'
-                ? `${API_URL}/deliverer/login`
-                : `${API_URL}/farmer/login`;
+                ? `${API_URL}/user/deliverer/login`
+                : `${API_URL}/user/farmer/login`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -63,7 +63,7 @@ export default function Login() {
             const walletAddress = accounts[0];
 
             // 1. Lấy mã Nonce từ server
-            const resNonce = await fetch(`${API_URL}/inspector/request-nonce`, {
+            const resNonce = await fetch(`${API_URL}/user/inspector/request-nonce`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ walletAddress }),
@@ -77,7 +77,7 @@ export default function Login() {
             const signature = await signer.signMessage(message);
 
             // 3. Gửi chữ ký lên server để xác thực
-            const resVerify = await fetch(`${API_URL}/inspector/verify`, {
+            const resVerify = await fetch(`${API_URL}/user/inspector/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ walletAddress, signature }),

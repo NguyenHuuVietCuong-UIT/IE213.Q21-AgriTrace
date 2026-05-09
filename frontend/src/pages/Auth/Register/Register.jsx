@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ethers } from 'ethers';
 import styles from './Register.module.css';
 
-const API_URL = 'http://localhost:5000/api/user';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
     // Thêm vai trò DELIVERER vào state mặc định
@@ -35,8 +35,8 @@ export default function Register() {
         try {
             // Xác định endpoint dựa trên role đang chọn
             const endpoint = role === 'DELIVERER'
-                ? `${API_URL}/deliverer/register`
-                : `${API_URL}/farmer/register`;
+                ? `${API_URL}/user/deliverer/register`
+                : `${API_URL}/user/farmer/register`;
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -79,7 +79,7 @@ export default function Register() {
 
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/inspector/register`, {
+            const response = await fetch(`${API_URL}/user/inspector/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: inspectorName, walletAddress }),

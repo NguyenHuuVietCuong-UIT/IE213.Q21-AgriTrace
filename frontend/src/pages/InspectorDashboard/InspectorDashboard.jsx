@@ -18,7 +18,7 @@ export const InspectorDashboard = () => {
         setProcessingId(batchId);
         try {
             const token = getAuthToken();
-            const pinRes = await fetch(`http://localhost:5000/api/batches/${batchId}/pin`, {
+            const pinRes = await fetch(`${import.meta.env.VITE_API_URL}/batches/${batchId}/pin`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -28,7 +28,7 @@ export const InspectorDashboard = () => {
             const mintResult = await handleMintNFT(`ipfs://${pinData.ipfsHash}`);
             if (!mintResult) return;
 
-            const confirmRes = await fetch(`http://localhost:5000/api/batches/${batchId}/mint`, {
+            const confirmRes = await fetch(`${import.meta.env.VITE_API_URL}/batches/${batchId}/mint`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ tokenId: mintResult.tokenId, txHash: mintResult.txHash })

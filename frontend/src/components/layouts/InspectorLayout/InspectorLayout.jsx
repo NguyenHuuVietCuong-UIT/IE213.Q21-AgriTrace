@@ -13,7 +13,7 @@ const InspectorLayout = () => {
         setLoading(true);
         try {
             const token = getAuthToken();
-            const response = await fetch('http://localhost:5000/api/batches/inspector-all', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/batches/inspector-all`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
             });
