@@ -3,13 +3,45 @@ import { ethers } from 'ethers';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_NFT_CONTRACT_ADDRESS || "0x_ĐIỀN_ĐỊA_CHỈ_CONTRACT_MỚI_VÀO_ĐÂY";
 
-// THÊM updateBatch VÀO ABI
 const MINIMAL_ABI = [
     "function mintBatch(string memory _ipfsHash) public",
     "function updateBatch(uint _tokenId, string memory _newIpfsHash) public",
     "event BatchMinted(uint tokenId, address owner, string ipfsHash)",
-    "event BatchUpdated(uint tokenId, address updater, string newIpfsHash)"
+    "event BatchUpdated(uint tokenId, string newIpfsHash)"
 ];
+
+// HÀM DỊCH MÃ LỖI WEB3 SANG TIẾNG VIỆT
+const parseWeb3Error = (error) => {
+    console.error("Mã lỗi gốc:", error);
+
+    // Lỗi người dùng tự hủy/từ chối trên MetaMask (Code 4001)
+    if (error.code === 4001 || error?.info?.error?.code === 4001 || error?.error?.code === 4001) {
+        return "Bạn đã từ chối giao dịch trên ví MetaMask.";
+    }
+
+    // Lỗi có popup MetaMask đang mở bị kẹt (Code -32002)
+    if (error.code === -32002) {
+        return "MetaMask đang có yêu cầu chờ xử lý. Vui lòng mở tiện ích MetaMask để kiểm tra.";
+    }
+
+    // Lỗi không đủ tiền trả phí Gas (Code -32000 hoặc -32603)
+    if (error.message && (error.message.includes("insufficient funds") || error.code === -32603)) {
+        return "Số dư SepoliaETH của bạn không đủ để trả phí Gas. Vui lòng nạp thêm.";
+    }
+
+    // Lỗi bị Smart Contract từ chối (Revert)
+    if (error.message && error.message.includes("execution reverted")) {
+        // Cố gắng trích xuất chuỗi revert từ contract (VD: "Chi chu so huu moi duoc cap nhat")
+        const match = error.message.match(/reason="([^"]+)"/);
+        if (match && match[1]) {
+            return `Giao dịch bị từ chối: ${match[1]}`;
+        }
+        return "Giao dịch bị Smart Contract từ chối. Bạn có thể không có quyền thao tác.";
+    }
+
+    // Lỗi mặc định
+    return `Lỗi Web3: ${error.message || "Không xác định"}`;
+};
 
 export const useWeb3 = () => {
     // 1. KHAI BÁO CÁC STATE
@@ -116,15 +148,21 @@ export const useWeb3 = () => {
                 await fetchNetwork();
                 await fetchBalance(accounts[0]);
             } else {
-                alert("Vui lòng cài đặt tiện ích mở rộng MetaMask!");
+                throw new Error("Vui lòng cài đặt tiện ích mở rộng MetaMask!");
             }
         } catch (error) {
             console.error("Lỗi kết nối ví:", error);
+            // Có thể dùng thông báo lỗi cho giao diện
+            if (error.message !== "Vui lòng cài đặt tiện ích mở rộng MetaMask!") {
+                const msg = parseWeb3Error(error);
+                throw new Error(msg);
+            } else {
+                throw error;
+            }
         } finally {
             setIsConnecting(false);
         }
     };
-
     // 3. XỬ LÝ SỰ KIỆN KHI TẢI TRANG / ĐỔI VÍ
     useEffect(() => {
         // Tự động kiểm tra xem ví đã kết nối chưa khi tải lại trang (F5)
@@ -211,20 +249,44 @@ export const useWeb3 = () => {
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
 
-            const tx = await contract.updateBatch(tokenId, newIpfsHash);
+            const tx = await contract.updateShipping(tokenId, newIpfsHash);
             const receipt = await tx.wait();
 
             return { txHash: receipt.hash, success: true };
         } catch (error) {
-            console.error("Lỗi cập nhật NFT:", error);
-            if (error.message && error.message.includes("Chi chu so huu moi duoc cap nhat")) {
-                alert("Bạn không có quyền cập nhật lô hàng này!");
-            } else {
-                alert("Có lỗi xảy ra khi gọi ví cập nhật NFT.");
-            }
-            return null;
+            const errorMessage = parseWeb3Error(error);
+            throw new Error(errorMessage);
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const verifyOnChainHistory = async (tokenId) => {
+        if (!window.ethereum) {
+            throw new Error("Vui lòng cài đặt MetaMask để xác minh.");
+        }
+
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, provider);
+
+            // 1. Để TRỐNG tham số trong filter để lấy TẤT CẢ sự kiện BatchUpdated của toàn bộ hệ thống
+            const filter = contract.filters.BatchUpdated();
+            const allEventLogs = await contract.queryFilter(filter);
+
+            // 2. Dùng Javascript để lọc ra những sự kiện khớp với tokenId hiện tại
+            const eventLogs = allEventLogs.filter(log => log.args[0].toString() === tokenId.toString());
+
+            // 3. Trả về danh sách các bản ghi
+            const onChainRecords = eventLogs.map(log => ({
+                ipfsHash: log.args[1],
+                txHash: log.transactionHash
+            }));
+
+            return onChainRecords;
+        } catch (error) {
+            const errorMessage = parseWeb3Error(error);
+            throw new Error(`Lỗi Web3: ${errorMessage}`);
         }
     };
 
@@ -239,6 +301,7 @@ export const useWeb3 = () => {
         connectWallet,
         disconnectWallet,
         handleMintNFT,
-        handleUpdateNFT
+        handleUpdateNFT,
+        verifyOnChainHistory
     };
 };

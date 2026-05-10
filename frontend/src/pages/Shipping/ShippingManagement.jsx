@@ -192,7 +192,9 @@ const ShippingManagement = () => {
               {currentBatch.logs && currentBatch.logs.length > 0 && (
                 <div className={styles.logsPreview} style={{ marginTop: '15px' }}>
                   <h4>Lịch sử vận chuyển:</h4>
-                  <ShippingLog logs={currentBatch.logs} />
+                  <ShippingLog
+                    logs={currentBatch.logs}
+                    tokenId={currentBatch.tokenId} />
                 </div>
               )}
             </div>

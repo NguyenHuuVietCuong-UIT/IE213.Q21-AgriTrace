@@ -4,7 +4,8 @@ const { ethers } = require('ethers');
 
 // ABI rút gọn chứa hàm updateShipping
 const MINIMAL_ABI = [
-    "function updateShipping(uint _tokenId, string memory _newIpfsHash) public"
+    "function updateShipping(uint _tokenId, string memory _newIpfsHash) public",
+    "event BatchUpdated(uint tokenId, string newIpfsHash)"
 ];
 
 const batchController = {

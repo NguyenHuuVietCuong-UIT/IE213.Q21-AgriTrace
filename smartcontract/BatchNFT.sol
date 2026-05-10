@@ -33,10 +33,7 @@ contract BatchNFT {
 
     function updateShipping(uint _tokenId, string memory _newIpfsHash) public {
         require(_tokenId > 0 && _tokenId < nextTokenId, "Token ID khong ton tai");
-        
         require(msg.sender == systemAdmin, "Chi he thong moi duoc cap nhat van chuyen");
-
-        batches[_tokenId].ipfsHash = _newIpfsHash;
         emit BatchUpdated(_tokenId, _newIpfsHash);
     }
 }
