@@ -172,7 +172,7 @@ await page.getByRole('button', {
   name: 'Đóng'
 
 }).click();
-//7.Đăng xuất và đăng nhập vào user Kiểm định viên
+//7.Đăng xuất 
 await page.getByText('Nông dân')
   .first()
   .click();
@@ -197,3 +197,7 @@ await expect(
   timeout: 60000
 });
 });
+
+// Cách chạy
+// 1. cài playwright
+// 2. chạy lệnh "npx playwright test farmer.spec.js" hoặc fullpath 
