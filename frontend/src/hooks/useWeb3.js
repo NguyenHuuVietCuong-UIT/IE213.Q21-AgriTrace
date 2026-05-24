@@ -43,6 +43,26 @@ const parseWeb3Error = (error) => {
     return `Lỗi Web3: ${error.message || "Không xác định"}`;
 };
 
+// HÀM HIỂN THỊ TOAST
+const showToast = (message, type = 'info') => {
+    if (window.toastManager) {
+        window.toastManager[type](message);
+    }
+};
+
+// HÀM ĐIỀU KHIỂN SPINNER
+const showSpinner = (message = 'Đang xử lý...') => {
+    if (window.web3Spinner) {
+        window.web3Spinner.show(message);
+    }
+};
+
+const hideSpinner = () => {
+    if (window.web3Spinner) {
+        window.web3Spinner.hide();
+    }
+};
+
 export const useWeb3 = () => {
     // 1. KHAI BÁO CÁC STATE
     const [account, setAccount] = useState(null);
@@ -95,12 +115,14 @@ export const useWeb3 = () => {
         setAccount(null);
         setNetworkName('');
         setBalance('0');
+        showToast('Ví đã ngắt kết nối', 'info');
     };
 
     const SEPOLIA_CHAIN_ID = '0xaa36a7';
 
     const connectWallet = async () => {
         setIsConnecting(true);
+        showSpinner('Đang kết nối ví MetaMask...');
         try {
             if (typeof window.ethereum !== 'undefined') {
                 // 1. Yêu cầu kết nối tài khoản
@@ -111,6 +133,7 @@ export const useWeb3 = () => {
 
                 if (currentChainId !== SEPOLIA_CHAIN_ID) {
                     try {
+                        showSpinner('Đang chuyển sang Sepolia Testnet...');
                         // 3. Yêu cầu MetaMask chuyển sang Sepolia
                         await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
@@ -120,6 +143,7 @@ export const useWeb3 = () => {
                         // Mã lỗi 4902 nghĩa là mạng chưa được thêm vào MetaMask
                         if (switchError.code === 4902) {
                             try {
+                                showSpinner('Đang thêm Sepolia Testnet vào MetaMask...');
                                 await window.ethereum.request({
                                     method: 'wallet_addEthereumChain',
                                     params: [
@@ -138,6 +162,7 @@ export const useWeb3 = () => {
                                 });
                             } catch (addError) {
                                 console.error("Không thể thêm mạng Sepolia:", addError);
+                                showToast('Không thể thêm Sepolia Testnet', 'error');
                             }
                         }
                         console.error("Lỗi chuyển mạng:", switchError);
@@ -147,16 +172,21 @@ export const useWeb3 = () => {
                 setAccount(accounts[0]);
                 await fetchNetwork();
                 await fetchBalance(accounts[0]);
+                hideSpinner();
+                showToast(`✓ Kết nối thành công: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'success');
             } else {
                 throw new Error("Vui lòng cài đặt tiện ích mở rộng MetaMask!");
             }
         } catch (error) {
             console.error("Lỗi kết nối ví:", error);
+            hideSpinner();
             // Có thể dùng thông báo lỗi cho giao diện
             if (error.message !== "Vui lòng cài đặt tiện ích mở rộng MetaMask!") {
                 const msg = parseWeb3Error(error);
+                showToast(msg, 'error');
                 throw new Error(msg);
             } else {
+                showToast(error.message, 'error');
                 throw error;
             }
         } finally {
@@ -190,6 +220,7 @@ export const useWeb3 = () => {
                     setAccount(accounts[0]);
                     fetchNetwork();
                     fetchBalance(accounts[0]);
+                    showToast(`✓ Tài khoản thay đổi: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`, 'info');
                 } else {
                     disconnectWallet();
                 }
@@ -204,17 +235,21 @@ export const useWeb3 = () => {
     // 4. CÁC HÀM TƯƠNG TÁC SMART CONTRACT
     const handleMintNFT = async (tokenURI) => {
         if (!account) {
-            alert("Vui lòng kết nối ví MetaMask ở góc trái trước khi đúc NFT!");
+            showToast('⚠ Vui lòng kết nối ví MetaMask trước khi đúc NFT!', 'warning');
             return null;
         }
 
         setIsMinting(true);
+        showSpinner('⏳ Chờ ký giao dịch trên MetaMask...');
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
 
+            showSpinner('⏳ Đang gửi giao dịch lên blockchain...');
             const tx = await contract.mintBatch(tokenURI);
+            
+            showSpinner('⏳ Đang chờ xác nhận giao dịch...');
             const receipt = await tx.wait();
 
             let tokenId = null;
@@ -227,10 +262,14 @@ export const useWeb3 = () => {
                 } catch (e) { /* Bỏ qua log rác */ }
             }
 
+            hideSpinner();
+            showToast(`✓ Đúc NFT thành công! ID: ${tokenId}`, 'success');
             return { txHash: receipt.hash, tokenId };
         } catch (error) {
             console.error("Lỗi đúc NFT:", error);
-            alert("Có lỗi xảy ra khi gọi ví đúc NFT.");
+            hideSpinner();
+            const errorMsg = parseWeb3Error(error);
+            showToast(`✗ ${errorMsg}`, 'error');
             return null;
         } finally {
             setIsMinting(false);
@@ -239,22 +278,31 @@ export const useWeb3 = () => {
 
     const handleUpdateNFT = async (tokenId, newIpfsHash) => {
         if (!account) {
-            alert("Vui lòng kết nối ví MetaMask!");
+            showToast('⚠ Vui lòng kết nối ví MetaMask!', 'warning');
             return null;
         }
 
         setIsUpdating(true);
+        showSpinner('⏳ Chờ ký giao dịch cập nhật...');
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const signer = await provider.getSigner();
             const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, signer);
 
+            showSpinner('⏳ Đang gửi giao dịch cập nhật...');
             const tx = await contract.updateShipping(tokenId, newIpfsHash);
+            
+            showSpinner('⏳ Đang chờ xác nhận...');
             const receipt = await tx.wait();
 
+            hideSpinner();
+            showToast('✓ Cập nhật NFT thành công!', 'success');
             return { txHash: receipt.hash, success: true };
         } catch (error) {
+            console.error("Lỗi cập nhật NFT:", error);
+            hideSpinner();
             const errorMessage = parseWeb3Error(error);
+            showToast(`✗ ${errorMessage}`, 'error');
             throw new Error(errorMessage);
         } finally {
             setIsUpdating(false);
@@ -263,9 +311,11 @@ export const useWeb3 = () => {
 
     const verifyOnChainHistory = async (tokenId) => {
         if (!window.ethereum) {
+            showToast('⚠ Vui lòng cài đặt MetaMask để xác minh.', 'warning');
             throw new Error("Vui lòng cài đặt MetaMask để xác minh.");
         }
 
+        showSpinner('⏳ Đang xác minh lịch sử trên blockchain...');
         try {
             const provider = new ethers.BrowserProvider(window.ethereum);
             const contract = new ethers.Contract(CONTRACT_ADDRESS, MINIMAL_ABI, provider);
@@ -283,9 +333,14 @@ export const useWeb3 = () => {
                 txHash: log.transactionHash
             }));
 
+            hideSpinner();
+            showToast(`✓ Tìm thấy ${onChainRecords.length} bản ghi`, 'success');
             return onChainRecords;
         } catch (error) {
+            console.error("Lỗi xác minh:", error);
+            hideSpinner();
             const errorMessage = parseWeb3Error(error);
+            showToast(`✗ Lỗi Web3: ${errorMessage}`, 'error');
             throw new Error(`Lỗi Web3: ${errorMessage}`);
         }
     };

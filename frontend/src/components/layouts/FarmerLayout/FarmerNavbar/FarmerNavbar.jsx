@@ -85,13 +85,6 @@ const FarmerNavbar = () => {
         >
           <LuBook /> Nhật ký canh tác
         </NavLink>
-
-        <NavLink
-          to="/farmer/profile"
-          className={({ isActive }) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}
-        >
-          <LuUser /> Hồ sơ trang trại
-        </NavLink>
       </div>
 
       {/* Thông tin User & Thông báo */}

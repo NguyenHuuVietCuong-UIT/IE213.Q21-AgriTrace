@@ -1,5 +1,7 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ToastContainer from './components/Web3/ToastContainer';
+import Web3Spinner from './components/Web3/Web3Spinner';
 
 // Sử dụng React.lazy để tải trang bất đồng bộ
 const MainLayout = React.lazy(() => import('./components/layouts/MainLayout/MainLayout'));
@@ -21,12 +23,29 @@ const InspectorSettings = React.lazy(() => import('./pages/InspectorDashboard/In
 const PageLoader = () => <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>Đang tải trang...</div>;
 
 function App() {
+  const [spinnerVisible, setSpinnerVisible] = useState(false);
+  const [spinnerMessage, setSpinnerMessage] = useState('Đang xử lý...');
+
+  React.useEffect(() => {
+    // Expose spinner controls globally for Web3 operations
+    window.web3Spinner = {
+      show: (message = 'Đang xử lý...') => {
+        setSpinnerMessage(message);
+        setSpinnerVisible(true);
+      },
+      hide: () => setSpinnerVisible(false),
+    };
+  }, []);
+
   console.log("App AgriTrace đang chạy");
 
   return (
-    <Router>
-      {/* BẮT BUỘC PHẢI THÊM THẺ SUSPENSE Ở ĐÂY */}
-      <Suspense fallback={<PageLoader />}>
+    <>
+      <ToastContainer />
+      <Web3Spinner isVisible={spinnerVisible} message={spinnerMessage} />
+      <Router>
+        {/* BẮT BUỘC PHẢI THÊM THẺ SUSPENSE Ở ĐÂY */}
+        <Suspense fallback={<PageLoader />}>
         <Routes>
 
           {/* Tuyến đường Đăng nhập */}
@@ -70,6 +89,7 @@ function App() {
         </Routes>
       </Suspense>
     </Router>
+    </>
   );
 }
 
