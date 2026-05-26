@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Toast.css';
-import { LuCheck, LuX, LuAlertCircle } from 'react-icons/lu';
+import { LuCheck, LuX, LuCircleAlert } from 'react-icons/lu';
 
-const Toast = ({ message = '', type = 'info', duration = 4000, onClose = () => {} }) => {
+const Toast = ({ message = '', type = 'info', duration = 4000, onClose = () => { } }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {

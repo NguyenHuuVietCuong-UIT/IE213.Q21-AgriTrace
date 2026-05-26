@@ -240,53 +240,51 @@ const batchController = {
             }
 
             // 2. Thêm log vận chuyển vào DB bằng DAO
-            // ⭐ LƯU Ý: Không gửi actorId=null vì schema không chấp nhận null value
             const logData = {
                 action: status,
                 location: location.trim(),
                 timestamp: new Date()
             };
-            const updatedBatch = await batchDao.pushLog(batchId, logData);
 
-            // 3. Gom Data mới để Pin lại lên IPFS
+            // Chỉ gọi pushLog để thêm dữ liệu vào DB, không sử dụng kết quả trả về do DB chưa cập nhật đồng bộ bản ghi mới
+            await batchDao.pushLog(batchId, logData);
+
+            // ==========================================
+            // FETCH LẠI BATCH MỚI NHẤT
+            // ==========================================
+            // Gọi lại hàm findByIdWithProduct để lấy batch đã chứa log vừa thêm và populate đầy đủ object product
+            const newestBatch = await batchDao.findByIdWithProduct(batchId);
+
+            // 3. Gom Data đầy đủ để Pin lại lên IPFS
             const dataToPin = {
-                batchId: updatedBatch._id,
-                product: updatedBatch.productId,
-                harvestDate: updatedBatch.harvestDate,
-                logs: updatedBatch.logs // Lấy logs mới nhất sau khi push
+                batchId: newestBatch._id,
+                product: newestBatch.productId,
+                harvestDate: newestBatch.harvestDate,
+                quantity: newestBatch.quantity, // Đã bổ sung trường quantity
+                logs: newestBatch.logs          // Mảng logs mới nhất chứa cả nhật ký canh tác và vận chuyển
             };
             const pinResult = await pinJsonToIPFS({ pinataContent: dataToPin });
             const newIpfsHash = pinResult.IpfsHash;
 
             // 4. Gọi Smart Contract bằng ethers.js
             // ==========================================
-            // 4.1 Khởi tạo Provider
             const provider = new ethers.JsonRpcProvider(process.env.ETH_RPC_URL);
-
-            // 4.2 Nạp ví Admin
             const wallet = new ethers.Wallet(process.env.SYSTEM_PRIVATE_KEY, provider);
-
-            // 4.3 Kết nối Contract
             const contract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, MINIMAL_ABI, wallet);
 
-            // 4.4 Gọi hàm updateShipping
-            const tx = await contract.updateShipping(updatedBatch.tokenId, newIpfsHash);
-
-            // 4.5 Đợi giao dịch hoàn tất trên mạng lưới
+            const tx = await contract.updateShipping(newestBatch.tokenId, newIpfsHash);
             const receipt = await tx.wait();
 
-            // 5. Cập nhật Hash mới vào DB thông qua DAO
+            // 5. Cập nhật Hash IPFS mới vào DB thông qua DAO
             await batchDao.updateFields(batchId, {
                 ipfsHash: newIpfsHash,
-                // Tùy chọn: Lưu lại transaction hash từ blockchain
-                // txHashShipping: receipt.transactionHash
             });
 
             return res.json({
                 success: true,
                 message: 'Cập nhật vận chuyển lên Blockchain thành công!',
                 newIpfsHash,
-                txHash: receipt.transactionHash  // Trả về TX hash để client xác nhận
+                txHash: receipt.transactionHash
             });
         } catch (err) {
             console.error("❌ Lỗi cập nhật vận chuyển:", err);

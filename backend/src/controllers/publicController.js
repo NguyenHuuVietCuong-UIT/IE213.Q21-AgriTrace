@@ -3,8 +3,10 @@ const publicDao = require('../daos/publicDAO');
 // Import hàm đọc IPFS mới viết
 const { fetchJsonFromIPFS } = require('../utils/ipfs');
 
+// CẬP NHẬT 1: Thêm định nghĩa event BatchUpdated vào ABI
 const PUBLIC_CONTRACT_ABI = [
-    "function batches(uint256) view returns (uint256 tokenId, string ipfsHash, address owner)"
+    "function batches(uint256) view returns (uint256 tokenId, string ipfsHash, address owner)",
+    "event BatchUpdated(uint256 tokenId, string newIpfsHash)"
 ];
 
 const publicController = {
@@ -22,9 +24,36 @@ const publicController = {
             const provider = new ethers.JsonRpcProvider(process.env.ETH_RPC_URL);
             const contract = new ethers.Contract(process.env.NFT_CONTRACT_ADDRESS, PUBLIC_CONTRACT_ABI, provider);
 
+            // Lấy dữ liệu gốc lúc đúc (Mint)
             const contractData = await contract.batches(dbBatch.tokenId);
-            const onChainIpfsHash = contractData.ipfsHash;
+            let onChainIpfsHash = contractData.ipfsHash;
 
+            // ========================================================
+            // CẬP NHẬT 2: QUÉT SỰ KIỆN ĐỂ LẤY IPFS HASH MỚI NHẤT
+            // ========================================================
+            try {
+                // Tạo bộ lọc chỉ tìm sự kiện BatchUpdated của đúng tokenId này
+                const filter = contract.filters.BatchUpdated(dbBatch.tokenId);
+
+                // Quét lịch sử Blockchain để lấy mảng các sự kiện
+                const events = await contract.queryFilter(filter);
+
+                if (events.length > 0) {
+                    // Lấy sự kiện cập nhật mới nhất (nằm ở cuối mảng)
+                    const latestEvent = events[events.length - 1];
+
+                    // Trong Ethers.js v6, dữ liệu event nằm trong mảng args. 
+                    // args[0] là tokenId, args[1] là newIpfsHash
+                    onChainIpfsHash = latestEvent.args[1];
+
+                    console.log(`[Tra cứu] Đã cập nhật IPFS Hash mới nhất từ Event cho Token ${dbBatch.tokenId}`);
+                }
+            } catch (eventErr) {
+                console.error("Lỗi khi quét sự kiện Blockchain:", eventErr.message);
+                // Nếu lỗi mạng lưới khi quét, vẫn tiếp tục chạy với onChainIpfsHash gốc để hệ thống không bị sập
+            }
+
+            // Kiểm tra kết quả cuối cùng
             if (!onChainIpfsHash) {
                 return res.status(404).json({ message: 'Dữ liệu Blockchain bị trống.' });
             }
@@ -46,7 +75,7 @@ const publicController = {
                 metaData: {
                     tokenId: contractData.tokenId.toString(),
                     contractAddress: process.env.NFT_CONTRACT_ADDRESS,
-                    ipfsHash: onChainIpfsHash,
+                    ipfsHash: onChainIpfsHash, // Đây sẽ là hash mới nhất (nếu có sự kiện update)
                     mintTxHash: dbBatch.txHash,
                     ownerWallet: contractData.owner
                 },
